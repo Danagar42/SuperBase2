@@ -49,7 +49,7 @@
 
     <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
-    <header class="bg-white/80 dark:bg-dark-panel/80 backdrop-blur-md border-b border-slate-200 dark:border-dark-border z-40 flex items-center shrink-0 transition-colors h-[72px]">
+    <header class="glass-panel brand-glow border-b border-slate-200 dark:border-dark-border z-40 flex items-center shrink-0 transition-colors h-[72px]">
         
         <!-- Ліва частина (логотип) - ширина збігається з боковим меню -->
         <div class="w-auto md:w-[340px] shrink-0 h-full flex items-center md:justify-center relative px-4 md:px-0">
@@ -96,7 +96,7 @@
     <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
         
         <!-- Ліва панель -->
-        <aside class="w-full md:w-[340px] bg-white/50 dark:bg-dark-panel/50 border-r border-slate-200 dark:border-dark-border flex flex-col shrink-0 overflow-hidden z-20">
+        <aside class="w-full md:w-[340px] glass-panel border-r border-slate-200 dark:border-dark-border flex flex-col shrink-0 overflow-hidden z-20">
             <div class="p-5 flex flex-col gap-6 overflow-y-auto h-full">
                 
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60">
@@ -254,17 +254,19 @@
                 <div id="view-calc" class="hidden flex-1 overflow-y-auto space-y-5 pb-6">
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-5">
                         <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                            <div class="shrink-0 w-full sm:w-32">
-                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Темп. (Робоча), °C</label>
+                            <div class="shrink-0 w-full sm:w-32 flex flex-col gap-2">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Темп. (Робоча), °C</label>
                                 <div class="relative">
                                     <input type="number" id="calcTemp" value="20" min="20" max="600" class="w-full bg-brand-50 dark:bg-slate-900 border border-brand-200 dark:border-slate-700 text-brand-700 dark:text-brand-400 rounded-xl focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
+                                <input type="range" id="calcTempSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
                             </div>
-                            <div class="shrink-0 w-full sm:w-32">
-                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Темп. (ГВ), °C</label>
+                            <div class="shrink-0 w-full sm:w-32 flex flex-col gap-2">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Темп. (ГВ), °C</label>
                                 <div class="relative">
                                     <input type="number" id="calcTempGv" value="20" min="20" max="600" class="w-full bg-indigo-50 dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
+                                <input type="range" id="calcTempGvSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
                             </div>
                             <div class="shrink-0 w-full sm:w-auto flex-1 sm:flex-none">
                                 <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сейсмостійкість</label>
@@ -487,6 +489,13 @@
                     </div>
                     <div class="relative w-full h-[400px] flex-1">
                         <canvas id="matChart"></canvas>
+                        <div id="chart-no-data" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 transition-all duration-300">
+                            <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 mb-3 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                            </div>
+                            <h4 class="text-base font-bold text-slate-800 dark:text-slate-200">Немає числових даних для графіка</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">Всі значення характеристик для цього матеріалу позначені як прочерк "—"</p>
+                        </div>
                     </div>
                     <div id="chart-warning" class="hidden mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 p-4 rounded-xl text-sm flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>

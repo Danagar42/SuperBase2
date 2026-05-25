@@ -201,7 +201,7 @@ function init() {
 
     let headerHtml = `<th class="sticky-col-header first-col py-3.5 px-4 font-semibold text-left min-w-[280px]">Характеристика \\ Т, °С</th>`;
     temperatures.forEach(t => { 
-        const th = `<th class="sticky-col-header py-3.5 px-4 font-semibold text-center min-w-[80px]">${t}</th>`;
+        const th = `<th data-temp-col="${t}" class="sticky-col-header py-3.5 px-4 font-semibold text-center min-w-[80px] transition-colors duration-200">${t}</th>`;
         headerHtml += th;
     });
     el.tHead.innerHTML = headerHtml;
@@ -215,6 +215,38 @@ function init() {
     document.getElementById('view-calc').addEventListener('input', updateCalculator);
     document.getElementById('view-calc').addEventListener('change', updateCalculator);
     document.getElementById('coefModal').addEventListener('input', updateCalculator);
+
+    // --- Синхронізація слайдерів (повзунків) температур з інпутами ---
+    const calcTemp = document.getElementById('calcTemp');
+    const calcTempSlider = document.getElementById('calcTempSlider');
+    const calcTempGv = document.getElementById('calcTempGv');
+    const calcTempGvSlider = document.getElementById('calcTempGvSlider');
+
+    if (calcTemp && calcTempSlider) {
+        calcTempSlider.addEventListener('input', (e) => {
+            calcTemp.value = e.target.value;
+            updateCalculator();
+        });
+        calcTemp.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+                calcTempSlider.value = Math.max(20, Math.min(600, val));
+            }
+        });
+    }
+
+    if (calcTempGv && calcTempGvSlider) {
+        calcTempGvSlider.addEventListener('input', (e) => {
+            calcTempGv.value = e.target.value;
+            updateCalculator();
+        });
+        calcTempGv.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+                calcTempGvSlider.value = Math.max(20, Math.min(600, val));
+            }
+        });
+    }
 
     document.getElementById('devModeToggle').addEventListener('change', (e) => {
         isDevMode = e.target.checked;
@@ -1071,7 +1103,7 @@ function renderTable() {
             const displayValue = safeValue === '—' 
                 ? `<span class="text-slate-300 dark:text-slate-600">—</span>` 
                 : `<span class="font-semibold text-slate-700 dark:text-slate-200">${safeValue}</span>`;
-            tbodyHtml += `<td class="py-3.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50">${displayValue}</td>`;
+            tbodyHtml += `<td data-temp-col="${t}" class="py-3.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50 transition-colors duration-200">${displayValue}</td>`;
         });
         tbodyHtml += `</tr>`;
     });
@@ -1127,10 +1159,23 @@ function renderChart() {
     });
     
     const warningEl = document.getElementById('chart-warning');
-    if (validTemps.length > 0 && validTemps.length < 3) {
-        warningEl.classList.remove('hidden');
+    const canvasEl = document.getElementById('matChart');
+    const noDataEl = document.getElementById('chart-no-data');
+
+    if (validTemps.length === 0) {
+        if (warningEl) warningEl.classList.add('hidden');
+        if (canvasEl) canvasEl.classList.add('hidden');
+        if (noDataEl) noDataEl.classList.remove('hidden');
+        return;
     } else {
-        warningEl.classList.add('hidden');
+        if (canvasEl) canvasEl.classList.remove('hidden');
+        if (noDataEl) noDataEl.classList.add('hidden');
+        
+        if (validTemps.length < 3) {
+            if (warningEl) warningEl.classList.remove('hidden');
+        } else {
+            if (warningEl) warningEl.classList.add('hidden');
+        }
     }
 
     if (chartInstance) {
@@ -1223,6 +1268,37 @@ function getStepValue(targetT, xArray, yArray) {
     return null;
 }
 
+function getStepTemperature(targetT, xArray, yArray) {
+    let validPoints = [];
+    for (let i = 0; i < xArray.length; i++) {
+        let yVal = yArray[i];
+        if (yVal !== undefined && yVal !== null && yVal !== "—" && !isNaN(yVal)) {
+            validPoints.push({x: xArray[i], y: parseFloat(yVal)});
+        }
+    }
+    if (validPoints.length === 0) return null;
+    for (let p of validPoints) {
+        if (p.x >= targetT) return p.x;
+    }
+    return null;
+}
+
+function highlightActiveColumn(activeTemp) {
+    document.querySelectorAll('[data-temp-col]').forEach(cell => {
+        cell.classList.remove('active-temp-col', 'active-temp-col-header');
+    });
+
+    if (activeTemp === null || isNaN(activeTemp)) return;
+
+    document.querySelectorAll(`[data-temp-col="${activeTemp}"]`).forEach(cell => {
+        if (cell.tagName === 'TH') {
+            cell.classList.add('active-temp-col-header');
+        } else {
+            cell.classList.add('active-temp-col');
+        }
+    });
+}
+
 function renderCell(id, value, formulaStr) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1264,6 +1340,9 @@ function updateCalculator() {
     
     let stepRtmGv = getStepValue(targetTGv, temperatures, yRtm);
     let stepRtpGv = getStepValue(targetTGv, temperatures, yRtp);
+
+    let activeColTemp = getStepTemperature(targetT, temperatures, yRtp);
+    highlightActiveColumn(activeColTemp);
 
     const nm = parseFloat(document.getElementById('calcNm').value) || 2.6;
     const nt = parseFloat(document.getElementById('calcNt').value) || 1.5;
@@ -1436,9 +1515,53 @@ function updateCalculator() {
     }
 }
 
+let addMatModalSnapshot = "";
+
+function takeAddMatFormSnapshot() {
+    const name = document.getElementById('newMatName').value.trim();
+    const desc = document.getElementById('newMatDesc').value.trim();
+    let values = [name, desc];
+    document.querySelectorAll('#newMatTableBody input').forEach(inp => {
+        values.push(inp.value.trim());
+    });
+    return JSON.stringify(values);
+}
+
+function isAddMatFormChanged() {
+    return takeAddMatFormSnapshot() !== addMatModalSnapshot;
+}
+
+function validateNewMatGrid() {
+    temperatures.forEach(t => {
+        const inputRtm = document.querySelector(`#newMatTableBody input[data-prop="RTm"][data-temp="${t}"]`);
+        const inputRtp = document.querySelector(`#newMatTableBody input[data-prop="RTp"][data-temp="${t}"]`);
+        
+        if (inputRtm && inputRtp) {
+            let valRtm = inputRtm.value.trim().replace(',', '.');
+            let valRtp = inputRtp.value.trim().replace(',', '.');
+            
+            let rtm = valRtm === "" ? null : parseFloat(valRtm);
+            let rtp = valRtp === "" ? null : parseFloat(valRtp);
+            
+            if (rtm !== null && rtp !== null && !isNaN(rtm) && !isNaN(rtp) && rtp > rtm) {
+                inputRtm.classList.add('input-error');
+                inputRtp.classList.add('input-error');
+            } else {
+                inputRtm.classList.remove('input-error');
+                inputRtp.classList.remove('input-error');
+            }
+        }
+    });
+}
+
 function initAddMaterialModal() {
     const addMatModal = document.getElementById('addMatModal');
-    const closeAddMatModal = () => {
+    const closeAddMatModal = (force = false) => {
+        if (!force && isAddMatFormChanged()) {
+            if (!confirm("У вас є незбережені зміни. Ви впевнені, що хочете закрити вікно? Всі внесені дані буде втрачено.")) {
+                return;
+            }
+        }
         addMatModal.classList.add('hidden');
         editingMatIndex = -1;
         editingGradeIndex = -1;
@@ -1449,12 +1572,24 @@ function initAddMaterialModal() {
         editingMatIndex = -1;
         document.getElementById('addMatTitle').textContent = "Додати власний матеріал";
         buildMaterialFormEmpty();
+        addMatModalSnapshot = takeAddMatFormSnapshot();
         addMatModal.classList.remove('hidden');
     });
 
-    document.getElementById('btnCloseAddMat').addEventListener('click', closeAddMatModal);
-    document.getElementById('btnCancelAddMat').addEventListener('click', closeAddMatModal);
-    document.getElementById('addMatModalBackdrop').addEventListener('click', closeAddMatModal);
+    document.getElementById('btnCloseAddMat').addEventListener('click', () => closeAddMatModal(false));
+    document.getElementById('btnCancelAddMat').addEventListener('click', () => closeAddMatModal(false));
+    
+    // Блокування випадкових закриттів по backdrop
+    document.getElementById('addMatModalBackdrop').addEventListener('click', () => {
+        // Backdrop click does not close modal automatically to prevent data loss.
+    });
+
+    // Миттєва валідація на події input в таблиці форми
+    document.getElementById('newMatTableBody').addEventListener('input', (e) => {
+        if (e.target.tagName === 'INPUT') {
+            validateNewMatGrid();
+        }
+    });
 
     document.getElementById('btnSaveAddMat').addEventListener('click', () => {
         const matName = document.getElementById('newMatName').value.trim();
@@ -1548,7 +1683,7 @@ function initAddMaterialModal() {
         }
 
         saveToLocalStorage();
-        closeAddMatModal();
+        closeAddMatModal(true);
         
         const currentSearch = el.search.value;
         updateMaterialList(currentSearch);
@@ -1777,6 +1912,9 @@ function openEditModal() {
     });
 
     document.getElementById('addMatModal').classList.remove('hidden');
+    addMatModalSnapshot = takeAddMatFormSnapshot();
+    validateNewMatGrid();
+    
     if(isBaseMaterial) {
         showToast("Пряме редагування базового матеріалу заборонено. Буде створено локальну копію.", "warning");
     }
