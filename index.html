@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperBase | Довідник матеріалів</title>
+    
+    <!-- Скрипт для уникнення білого спалаху (FOUC) при темній темі -->
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Підключаємо зовнішню базу даних (якщо є) -->
+    <script src="data.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe',
+                            500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+                        },
+                        dark: {
+                            bg: '#0f172a', panel: '#1e293b', border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="text-slate-800 dark:text-slate-200 h-screen flex flex-col overflow-hidden antialiased relative">
+
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <header class="bg-white/80 dark:bg-dark-panel/80 backdrop-blur-md border-b border-slate-200 dark:border-dark-border z-40 flex items-center shrink-0 transition-colors h-[72px]">
+        
+        <!-- Ліва частина (логотип) - ширина збігається з боковим меню -->
+        <div class="w-auto md:w-[340px] shrink-0 h-full flex items-center md:justify-center relative px-4 md:px-0">
+            <svg viewBox="0 0 221 39" class="h-8 md:h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
+                 <g>
+                  <g id="svg_1">
+                   <path d="m56.57869,19.46381l-9.1488,0l0,3.3044l10.6736,-0.0542l0,2.4558l-13.7414,0l0,-13.3621l13.7414,0l0.0182,2.4558l-10.6918,0l0,2.7627l9.1488,0l0,2.4376z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m63.77619,16.77341l8.8039,0l0,-4.9657l3.0496,0l0,13.3621l-3.0496,0l0,-5.7782l-8.8039,0l0,5.7782l-3.0678,0l0,-13.3621l3.0678,0l0,4.9657z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m90.71089,19.46381l-9.1489,0l0,3.3044l10.6737,-0.0542l0,2.4558l-13.7414,0l0,-13.3621l13.7414,0l0.0181,2.4558l-10.6918,0l0,2.7627l9.1489,0l0,2.4376z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m104.33399,11.80771c1.126,0 2.118,0.1866 2.977,0.5598c0.872,0.3732 1.543,0.8968 2.015,1.5709c0.484,0.6621 0.726,1.4326 0.726,2.3113l0,0.0722c0,1.4687 -0.441,2.5882 -1.325,3.3586c-0.883,0.7704 -2.178,1.1556 -3.884,1.1556l-6.9346,0l0,4.3337l-3.0678,0l0,-13.3621l9.4934,0zm-0.345,6.6449c0.69,0 1.241,-0.03 1.652,-0.0902c0.424,-0.0723 0.781,-0.2589 1.071,-0.5598c0.291,-0.313 0.436,-0.7945 0.436,-1.4445c0,-0.6862 -0.145,-1.1858 -0.436,-1.4988c-0.29,-0.325 -0.647,-0.5236 -1.071,-0.5958c-0.411,-0.0723 -0.962,-0.1084 -1.652,-0.1084l-0.708,0c-0.314,0 -0.859,0.006 -1.633,0.0181c-0.775,0 -2.0213,0 -3.7396,0l0,4.2794l6.0806,0z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m124.17099,11.80771l0,2.4377l-8.55,0l0,10.9244l-3.067,0l0,-13.3621l11.617,0z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m133.34299,11.51891c1.573,0 2.989,0.301 4.248,0.9029c1.27,0.6019 2.263,1.4385 2.977,2.5099c0.714,1.0713 1.071,2.2751 1.071,3.6113c0,1.3242 -0.357,2.516 -1.071,3.5753c-0.714,1.0592 -1.701,1.8959 -2.959,2.5098c-1.259,0.602 -2.675,0.9029 -4.248,0.9029c-1.525,0 -2.929,-0.3009 -4.211,-0.9029c-1.283,-0.6139 -2.3,-1.4506 -3.05,-2.5098c-0.75,-1.0715 -1.125,-2.2632 -1.125,-3.5753c0,-1.3242 0.375,-2.5219 1.125,-3.5933c0.75,-1.0714 1.761,-1.908 3.032,-2.5099c1.282,-0.6139 2.686,-0.9209 4.211,-0.9209zm0,11.5202c0.883,0 1.718,-0.1745 2.505,-0.5236c0.787,-0.3491 1.422,-0.8607 1.906,-1.5348c0.484,-0.6862 0.726,-1.4987 0.726,-2.4377c0,-0.9269 -0.248,-1.7334 -0.744,-2.4196c-0.484,-0.6862 -1.126,-1.2098 -1.924,-1.5709c-0.787,-0.3612 -1.622,-0.5417 -2.505,-0.5417c-0.944,0 -1.809,0.1805 -2.596,0.5417c-0.775,0.3611 -1.392,0.8787 -1.852,1.5528c-0.46,0.6742 -0.689,1.4747 -0.689,2.4016c0,0.9509 0.236,1.7696 0.707,2.4557c0.484,0.6742 1.12,1.1918 1.906,1.5529c0.787,0.3491 1.64,0.5236 2.56,0.5236z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m159.47299,25.16981l-3.196,0l-1.543,-2.835l-8.477,0l-1.543,2.835l-3.194,0l7.279,-13.3621l3.394,0l7.28,13.3621zm-8.968,-10.6174l-2.904,5.3087l5.79,0l-2.886,-5.3087z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m157.22899,14.35381l0,-2.5461l15.212,0l-15.212,2.5461zm15.212,-2.5461l0,2.6002l-6.027,0l0,10.7619l-3.067,0l0,-10.7619l-6.118,0l0,-2.6002l15.212,0z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m182.01399,11.51891c1.573,0 2.99,0.301 4.248,0.9029c1.271,0.6019 2.263,1.4385 2.977,2.5099c0.714,1.0713 1.07,2.2751 1.07,3.6113c0,1.3242 -0.356,2.516 -1.07,3.5753c-0.714,1.0592 -1.701,1.8959 -2.959,2.5098c-1.259,0.602 -2.674,0.9029 -4.247,0.9029c-1.526,0 -2.929,-0.3009 -4.212,-0.9029c-1.283,-0.6139 -2.299,-1.4506 -3.049,-2.5098c-0.75,-1.0715 -1.126,-2.2632 -1.126,-3.5753c0,-1.3242 0.376,-2.5219 1.126,-3.5933c0.75,-1.0714 1.76,-1.908 3.031,-2.5099c1.283,-0.6139 2.687,-0.9209 4.211,-0.9209zm0,11.5202c0.884,0 1.719,-0.1745 2.505,-0.5236c0.787,-0.3491 1.422,-0.8607 1.906,-1.5348c0.485,-0.6862 0.726,-1.4987 0.726,-2.4377c0,-0.9269 -0.248,-1.7334 -0.745,-2.4196c-0.483,-0.6862 -1.124,-1.2098 -1.923,-1.5709c-0.787,-0.3612 -1.622,-0.5417 -2.505,-0.5417c-0.943,0 -1.81,0.1805 -2.596,0.5417c-0.774,0.3611 -1.392,0.8787 -1.852,1.5528c-0.459,0.6742 -0.689,1.4747 -0.689,2.4016c0,0.9509 0.235,1.7696 0.708,2.4557c0.483,0.6742 1.119,1.1918 1.906,1.5529c0.787,0.3491 1.639,0.5236 2.559,0.5236z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m210.43199,11.80771l0,13.3621l-3.069,0l0,-8.3603l-4.101,8.3603l-3.069,0l-4.392,-8.4867l0,8.4867l-3.067,0l0,-13.3621l3.702,0l5.265,10.2924l5.045,-10.2924l3.686,0z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                   <path d="m18.11239,0.00001c-3.8136,0.00246 -7.5292,1.19954 -10.61802,3.42087c-3.0888,2.22134 -5.3934,5.35373 -6.58574,8.95123c-1.19234,3.5976 -1.21168,7.477 -0.05526,11.0861c1.15641,3.6093 3.42966,6.7641 6.49618,9.0157c3.06654,2.2516 6.77004,3.4852 10.58334,3.5251c3.8135,0.04 7.5422,-1.1157 10.6559,-3.3026c3.1137,-2.1867 5.4535,-5.2933 6.6863,-8.8775c1.2328,-3.584 1.2959,-7.463 0.1802,-11.0848c-1.1379,-3.6864 -3.4369,-6.91297 -6.5587,-9.20519c-3.1219,-2.29223 -6.9019,-3.52916 -10.7842,-3.52891zm-12.14097,9.1734l12.04087,0l2.9901,6.8544l-2.9901,0l0,-1.85l-12.04087,0l0,-5.0044zm12.14097,25.9088l-0.1001,0l0,-8.0908l-12.04087,0l0,-10.9721l12.01787,0l0,4.8027l-7.7258,0l0,1.3668l7.7258,0l0,-1.3668l5.0875,0l2.5754,5.9137l5.4995,0l-7.6829,-17.5879l-5.4565,0l0,-8.1958l0.1001,0c4.5191,0.05792 8.8333,1.88149 12.0083,5.07576c3.1752,3.19434 4.9555,7.50214 4.9555,11.99074c0,4.4886 -1.7803,8.7965 -4.9555,11.9907c-3.175,3.1942 -7.4892,5.0178 -12.0083,5.0758l0,-0.0028z" fill="currentColor" class="text-slate-800 dark:text-white"/>
+                  </g>
+                  <text xml:space="preserve" text-anchor="start" font-family="Inter, sans-serif" font-weight="500" font-size="8.5" y="37" x="42" stroke-width="0" fill="currentColor" class="text-slate-800 dark:text-white">Філія «ВП «Науково-технічний центр»</text>
+                 </g>
+            </svg>
+            <!-- Короткий роздільник -->
+            <div class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
+        </div>
+
+        <!-- Права частина (заголовок та кнопки) - розтягується на залишок екрана -->
+        <div class="flex-1 h-full flex items-center justify-between px-4 md:px-6">
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:flex items-center gap-2">
+                <span class="flex items-baseline"><span id="easterEggTrigger" class="text-3xl font-black text-blue-600 dark:text-blue-500 cursor-pointer select-none transition-transform active:scale-90">S</span>uperBase</span>
+                <span class="text-brand-600 dark:text-brand-400 font-semibold text-xs bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800/50 px-2.5 py-1 rounded-md hidden lg:inline">
+                    Довідник матеріалів
+                </span>
+            </h1>
+
+            <div class="flex items-center gap-3 ml-auto">
+                <button id="themeToggle" aria-label="Перемикач теми" title="Перемикач теми" class="p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+                    <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+        
+        <!-- Ліва панель -->
+        <aside class="w-full md:w-[340px] bg-white/50 dark:bg-dark-panel/50 border-r border-slate-200 dark:border-dark-border flex flex-col shrink-0 overflow-hidden z-20">
+            <div class="p-5 flex flex-col gap-6 overflow-y-auto h-full">
+                
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60">
+                    <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-500"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Вибір матеріалу
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </div>
+                                <input type="text" id="searchInput" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block w-full pl-10 p-2.5 outline-none transition-all" placeholder="Пошук (напр. Ст3сп5)...">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="materialSelect" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 ml-1">МАРКА СТАЛІ/СПЛАВУ</label>
+                            <select id="materialSelect" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-medium text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block p-2.5 outline-none transition-all cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.2em;"></select>
+                        </div>
+
+                        <div>
+                            <label for="kpSelect" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 ml-1">КАТЕГОРІЯ МІЦНОСТІ (КП)</label>
+                            <select id="kpSelect" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-medium text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block p-2.5 outline-none transition-all cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.2em;"></select>
+                        </div>
+                        
+                        <div id="reportActions" class="hidden pt-4 border-t border-slate-100 dark:border-slate-700">
+                            <div class="mb-4">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">Найменування елемента</label>
+                                <div class="flex flex-col gap-2.5 ml-1">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Фланець" class="report-element-cb w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-slate-900 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer transition-colors">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">Фланець</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Шпильки" class="report-element-cb w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-slate-900 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer transition-colors">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">Шпильки</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Різьба" class="report-element-cb w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-slate-900 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer transition-colors">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">Різьба</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="button" id="btnAddToReport" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Додати в список
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="btnOpenAddMat" aria-label="Додати власний матеріал" class="w-full bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 border-2 border-dashed border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-400 text-sm font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 group shadow-sm shrink-0">
+                    <div class="bg-brand-100 dark:bg-brand-900/50 p-1 rounded-md group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </div>
+                    Додати власний матеріал
+                </button>
+
+                <div id="defaultSidebarActions" class="mt-auto flex flex-col gap-6 transition-opacity">
+                    <button type="button" id="btnExportJS" aria-label="Отримати код бази" title="Отримати код бази для оновлення data.js" class="w-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-sm font-semibold py-3 px-4 rounded-2xl transition-all border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Експорт в JS Код</span>
+                    </button>
+                </div>
+
+                <div id="reportSidebarActions" class="hidden mt-auto flex-col gap-3">
+                    <button type="button" id="btnToggleReportList" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 text-sm font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-between shadow-sm">
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                            <span id="reportListToggleText">Показати список (0)</span>
+                        </span>
+                        <svg id="reportListToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    
+                    <div id="sidebarReportListWrapper" class="hidden flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Права панель -->
+        <main class="flex-1 p-4 md:p-6 overflow-hidden relative">
+            
+            <div id="empty-state" class="hidden h-full flex-col items-center justify-center text-center p-8 modal-animate">
+                <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-5 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 dark:text-slate-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Немає даних для відображення</h2>
+                <p class="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Оберіть матеріал зі списку ліворуч або додайте новий матеріал власноруч.</p>
+            </div>
+
+            <div id="app-content" class="w-full max-w-[1400px] mx-auto flex flex-col h-full overflow-hidden">
+                
+                <div class="mb-5 shrink-0 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                    
+                    <div class="flex-1 w-full xl:w-auto">
+                        <div id="headerMaterialInfo" class="flex items-center gap-3">
+                            <button id="btnFavorite" aria-label="Додати до вибраного" title="Додати до вибраного" class="text-slate-300 hover:text-amber-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </button>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight" id="mTitle">Характеристики матеріалу</h2>
+                                    <button id="btnEditMat" aria-label="Редагувати матеріал" title="Редагувати матеріал" class="text-brand-500 hover:text-brand-700 bg-brand-50 dark:bg-brand-900/30 p-1.5 rounded-lg transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                </div>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium" id="mSubtitle">Оберіть матеріал зліва</p>
+                            </div>
+                        </div>
+
+                        <div id="headerReportInfo" class="hidden items-center gap-3">
+                            <div class="text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2.5 rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Зведений звіт</h2>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">Порівняльна таблиця механічних характеристик та допустимих напружень</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl flex space-x-1 shrink-0 border border-slate-200/50 dark:border-slate-700 w-full xl:w-auto overflow-x-auto">
+                        <button id="tab-btn-table" onclick="switchTab('table')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm border border-slate-200/50 dark:border-slate-600 transition-all focus:outline-none whitespace-nowrap">
+                            Властивості
+                        </button>
+                        <button id="tab-btn-calc" onclick="switchTab('calc')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
+                            Напруження [&sigma;]
+                        </button>
+                        <button id="tab-btn-chart" onclick="switchTab('chart')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
+                            Графіки
+                        </button>
+                        <button id="tab-btn-report" onclick="switchTab('report')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
+                            Для звіту
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладки (1, 2, 3, 4) -->
+                <div id="view-table" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden flex flex-col transition-opacity duration-200 self-start max-h-full w-full min-h-0">
+                    <div class="table-container overflow-auto w-full relative">
+                        <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
+                            <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                <tr id="tableHeader"></tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-calc" class="hidden flex-1 overflow-y-auto space-y-5 pb-6">
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-5">
+                        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                            <div class="shrink-0 w-full sm:w-32">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Темп. (Робоча), °C</label>
+                                <div class="relative">
+                                    <input type="number" id="calcTemp" value="20" min="20" max="600" class="w-full bg-brand-50 dark:bg-slate-900 border border-brand-200 dark:border-slate-700 text-brand-700 dark:text-brand-400 rounded-xl focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
+                                </div>
+                            </div>
+                            <div class="shrink-0 w-full sm:w-32">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Темп. (ГВ), °C</label>
+                                <div class="relative">
+                                    <input type="number" id="calcTempGv" value="20" min="20" max="600" class="w-full bg-indigo-50 dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
+                                </div>
+                            </div>
+                            <div class="shrink-0 w-full sm:w-auto flex-1 sm:flex-none">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сейсмостійкість</label>
+                                <select id="calcSeismic" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block p-3 outline-none font-semibold text-base shadow-sm transition-all cursor-pointer">
+                                    <option value="1">І категорія</option>
+                                    <option value="2">ІІ категорія</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <label class="flex items-center justify-between sm:justify-center cursor-pointer bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium py-3 px-4 rounded-xl transition-colors border border-slate-200 dark:border-slate-700 shadow-sm w-full sm:w-auto gap-4">
+                                <span class="text-sm shrink-0">Показати формули</span>
+                                <div class="relative inline-flex items-center">
+                                    <input type="checkbox" id="devModeToggle" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500 shadow-inner"></div>
+                                </div>
+                            </label>
+                            <button type="button" id="btnToggleCoef" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold py-3 px-5 rounded-xl transition-all shadow-sm active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Коефіцієнти
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="devModeInfo" class="hidden bg-slate-900 text-slate-300 p-5 rounded-2xl text-sm font-mono shadow-lg overflow-x-auto relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
+                        <h4 class="text-brand-400 font-bold mb-4 uppercase text-xs tracking-wider border-b border-slate-700/50 pb-2 relative z-10">Проміжний розрахунок (Dev Mode)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                            <div id="devInfoSigma" class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 leading-relaxed"></div>
+                            <div id="devInfoSigmaW" class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 leading-relaxed"></div>
+                            <div id="devInfoRy" class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 leading-relaxed"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-5">
+                        <!-- Деталі -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                            <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
+                                <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Всі деталі (крім шпильок)</h3>
+                            </div>
+                            <div class="table-container overflow-x-auto w-full relative">
+                                <table class="w-full text-sm text-center border-separate border-spacing-0">
+                                    <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
+                                        <tr>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>1</sub></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_nue"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_pnue"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s1_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s1_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>2</sub></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_nue"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_pnue"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s2_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s2_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>RV</sub></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_srv_nue"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_srv_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>1</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_gv"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss1_pz"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss1_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>2</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_gv"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss2_pz"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss2_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&tau;)<sub>s</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_gv"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ts_pz"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ts_mrz"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Шпильки -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                            <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
+                                <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Шпильки / Болти</h3>
+                            </div>
+                            <div class="table-container overflow-x-auto w-full relative">
+                                <table class="w-full text-sm text-center border-separate border-spacing-0">
+                                    <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
+                                        <tr>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>1</sub></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_nue"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_pnue"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s1_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s1_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>3w</sub></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s3w_nue"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s3w_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>4w</sub></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s4w_nue"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s4w_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_pz"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>mw</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ssmw_pz"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ssmw_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>4w</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ss4w_pz"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ss4w_mrz"></td>
+                                        </tr>
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&tau;<sub>s</sub>)<sub>s</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_nue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_pnue"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ts_pz"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ts_mrz"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Опори -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                            <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
+                                <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Опорні конструкції</h3>
+                            </div>
+                            <div class="table-container overflow-x-auto w-full relative">
+                                <table class="w-full text-sm text-center border-separate border-spacing-0">
+                                    <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
+                                        <tr>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                                        <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                            <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">[R]</td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_nue"></td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pnue"></td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_gv"></td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pz"></td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_mrz"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div id="view-chart" class="hidden flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 p-5 overflow-hidden flex flex-col">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-2 h-6 bg-purple-500 rounded-full"></div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Криві міцності</h3>
+                    </div>
+                    <div class="relative w-full h-[400px] flex-1">
+                        <canvas id="matChart"></canvas>
+                    </div>
+                    <div id="chart-warning" class="hidden mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 p-4 rounded-xl text-sm flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <div>
+                            <strong class="block mb-1">Увага: мало точок даних</strong>
+                            Оскільки для цього матеріалу задано менше трьох температурних точок, графік використовує лінійну інтерполяцію. У реальності зміна властивостей металу при нагріванні може мати нелінійний характер.
+                        </div>
+                    </div>
+                </div>
+            
+                <div id="view-report" class="hidden overflow-y-auto overflow-x-hidden flex-col transition-opacity duration-200 self-start max-h-full w-full min-h-0 gap-5 scroll-smooth p-1">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex justify-end items-center shrink-0">
+                        <label class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 font-medium gap-3">
+                            <span class="text-sm shrink-0">Показати формули</span>
+                            <div class="relative inline-flex items-center">
+                                <input type="checkbox" id="reportDevModeToggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500 shadow-inner"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col shrink-0">
+                        <div class="p-5 border-b border-slate-100 dark:border-slate-700 shrink-0 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors select-none group rounded-t-2xl" onclick="toggleReportTable()">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-6 bg-indigo-500 rounded-full"></div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 tracking-tight">Механічні характеристики</h3>
+                            </div>
+                            <button class="text-slate-400 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors p-1 rounded-lg">
+                                <svg id="reportTableToggleIcon" class="w-5 h-5 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div id="reportTableWrapper" class="table-container overflow-x-auto w-full relative">
+                            <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
+                                <thead id="reportTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
+                                </thead>
+                                <tbody id="reportTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col shrink-0">
+                        <div class="p-5 border-b border-slate-100 dark:border-slate-700 shrink-0 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors select-none group rounded-t-2xl" onclick="toggleReportStressTable()">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-6 bg-teal-500 rounded-full"></div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 tracking-tight">Допустимі напруження</h3>
+                            </div>
+                            <button class="text-slate-400 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors p-1 rounded-lg">
+                                <svg id="reportStressTableToggleIcon" class="w-5 h-5 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div id="reportStressTableWrapper" class="table-container overflow-x-auto w-full relative">
+                            <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
+                                <thead id="reportStressTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
+                                </thead>
+                                <tbody id="reportStressTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Модальне вікно коефіцієнтів -->
+            <div id="coefModal" class="fixed inset-0 z-50 hidden">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" id="coefModalBackdrop"></div>
+                <div class="fixed inset-0 flex items-center justify-center p-4">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] modal-animate overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center justify-between p-5 md:px-8 md:py-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-3">
+                                <div class="bg-slate-200 dark:bg-slate-700 p-2 rounded-xl text-slate-600 dark:text-slate-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </div>
+                                Налаштування коефіцієнтів
+                            </h3>
+                            <button type="button" id="btnCloseCoef" aria-label="Закрити" title="Закрити" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 p-2.5 rounded-full transition-colors active:scale-90">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="p-5 md:px-8 overflow-y-auto space-y-6 bg-slate-50/30 dark:bg-slate-900/50">
+                            
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-visible">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Обладнання і трубопроводи</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за тимчасовим опором (зазвичай 2.6 для обладнання). ПНАЕ Г-7-002-86 п.5.3.1">
+                                            За тимчасовим опором (n<sub>m</sub>)
+                                        </label>
+                                        <input type="number" id="calcNm" value="2.6" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за межею текучості (зазвичай 1.5 для обладнання). ПНАЕ Г-7-002-86 п.5.3.1">
+                                            За межею текучості (n<sub>0,2</sub>)
+                                        </label>
+                                        <input type="number" id="calcNt" value="1.5" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-visible">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Кріпильні деталі (Болти)</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за межею текучості для кріпильних деталей. ПНАЕ Г-7-002-86 п.5.4.1">
+                                            За межею текучості (n<sub>0,2</sub>)
+                                        </label>
+                                        <input type="number" id="calcNtBolt" value="2.0" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-visible">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Опорні конструкції</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт умов роботи конструкції. ПНАЕ Г-7-002-86 п.5.6.1">
+                                            Умов межі текучості (&gamma;<sub>c</sub>)
+                                        </label>
+                                        <input type="number" id="calcGc" value="1.0" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за матеріалом (залежить від типу сталі). ПНАЕ Г-7-002-86 п.5.6.1">
+                                            Надійності матеріалу (&gamma;<sub>m</sub>)
+                                        </label>
+                                        <input type="number" id="calcGm" value="1.05" step="0.01" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за призначенням для нормальних умов експлуатації. ПНАЕ Г-7-002-86 п.5.6.1">
+                                            Призначення НУЕ (&gamma;<sub>n</sub>)
+                                        </label>
+                                        <input type="number" id="calcGnNue" value="1.25" step="0.05" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за призначенням для особливих умов (проектний землетрус). ПНАЕ Г-7-002-86 п.5.6.1">
+                                            Призначення НУЕ+ПЗ (&gamma;<sub>n</sub>)
+                                        </label>
+                                        <input type="number" id="calcGnPz" value="1.05" step="0.05" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex justify-end">
+                            <button type="button" id="btnApplyCoef" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95">
+                                Застосувати
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Модальне вікно "Додати/Редагувати матеріал" -->
+            <div id="addMatModal" class="fixed inset-0 z-50 hidden">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" id="addMatModalBackdrop"></div>
+                <div class="fixed inset-0 flex items-center justify-center p-4">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-6xl flex flex-col max-h-[95vh] modal-animate overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center justify-between p-5 md:px-8 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+                                <div class="bg-brand-100 dark:bg-brand-900/50 p-2 rounded-xl text-brand-600 dark:text-brand-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </div>
+                                <span id="addMatTitle">Додати власний матеріал</span>
+                            </h3>
+                            <button type="button" id="btnCloseAddMat" aria-label="Закрити" title="Закрити" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 p-2.5 rounded-full transition-colors active:scale-90">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                        <div class="p-5 md:px-8 md:py-6 overflow-y-auto space-y-6 flex-1 bg-white dark:bg-slate-800">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Марка сталі/сплаву *</label>
+                                    <input type="text" id="newMatName" placeholder="Наприклад, Сталь 20" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сортамент / Опис</label>
+                                    <input type="text" id="newMatDesc" placeholder="Наприклад, Поковки..." class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                                <div class="table-container overflow-x-auto w-full relative">
+                                    <table class="w-full text-xs text-left whitespace-nowrap border-separate border-spacing-0">
+                                        <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                            <tr id="newMatTableHeader"></tr>
+                                        </thead>
+                                        <tbody id="newMatTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 font-medium">Залиште поле порожнім, якщо немає даних для певної температури.</p>
+                        </div>
+                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end gap-3 shrink-0">
+                            <button type="button" id="btnCancelAddMat" class="bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm">
+                                Скасувати
+                            </button>
+                            <button type="button" id="btnSaveAddMat" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95">
+                                Зберегти матеріал
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Easter Egg Modal (Про розробника) -->
+            <div id="devModal" class="fixed inset-0 z-[100] hidden">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" id="devModalBackdrop"></div>
+                <div class="fixed inset-0 flex items-center justify-center p-4" id="devModalWrapper">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col modal-animate overflow-hidden border border-brand-200 dark:border-brand-700/50">
+                        <div class="p-8 text-center bg-gradient-to-br from-brand-50 to-white dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
+                            <!-- Хрестик для закриття -->
+                            <button type="button" id="btnCloseDevCross" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 bg-white/40 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-700 p-2 rounded-full transition-all z-20 backdrop-blur-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+
+                            <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                            
+                            <p class="text-sm font-bold text-brand-600 dark:text-brand-400 mb-1 relative z-10 uppercase tracking-wider">Розробник</p>
+                            <h3 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight mb-6 relative z-10">Максим Демиденко</h3>
+                            
+                            <div class="space-y-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 relative z-10 bg-white/60 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm backdrop-blur-sm">
+                                <p class="text-slate-800 dark:text-slate-200 font-bold">Філія «ВП НТЦ»</p>
+                                <p>Відділ конструкційної міцності обладнання</p>
+                                <p class="text-slate-800 dark:text-slate-200">АТ «НАЕК «Енергоатом»</p>
+                                <div class="pt-3 mt-3 border-t border-slate-200/80 dark:border-slate-700/80 text-slate-400 dark:text-slate-500 font-mono text-xs">
+                                    &copy; 2026
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
