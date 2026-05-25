@@ -1712,11 +1712,7 @@ function updateCalculator() {
             auditWarnings.classList.remove('hidden');
             auditWarnings.innerHTML = warnings.map(w => `<div>⚠ ${w}</div>`).join('');
         } else {
-            auditPanel.classList.add('bg-emerald-50/50', 'dark:bg-emerald-950/20', 'text-emerald-800', 'dark:text-emerald-300', 'border-emerald-200/50', 'dark:border-emerald-900/30');
-            auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
-            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-            auditTitle.textContent = "Параметри розрахунку: Норма";
-            auditDesc.textContent = "Розрахунок відповідає вимогам нормативності ПНАЕ G-7-002-86.";
+            auditPanel.classList.add('hidden');
         }
     }
 }
