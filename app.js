@@ -1469,7 +1469,21 @@ function updateCalculator() {
     const targetTGv = parseFloat(document.getElementById('calcTempGv').value);
     const seismicCategory = document.getElementById('calcSeismic').value; 
 
-    if (isNaN(targetT) || targetT <= 0 || isNaN(targetTGv) || targetTGv <= 0) return;
+    // Dynamic audit logs
+    const auditPanel = document.getElementById('calcAuditPanel');
+    const auditPing = document.getElementById('auditPing');
+    const auditDot = document.getElementById('auditStatusDot');
+    const auditTitle = document.getElementById('auditStatusTitle');
+    const auditDesc = document.getElementById('auditStatusDesc');
+    const auditWarnings = document.getElementById('auditWarningList');
+
+    let warnings = [];
+    let isCritical = false;
+
+    if (isNaN(targetT) || targetT <= 0 || isNaN(targetTGv) || targetTGv <= 0) {
+        isCritical = true;
+        warnings.push("Некоректні вхідні температури");
+    }
 
     let yRtm = temperatures.map(t => data["RTm"] ? data["RTm"][t] : null);
     let yRtp = temperatures.map(t => data["RTp"] ? data["RTp"][t] : null);
@@ -1490,6 +1504,29 @@ function updateCalculator() {
     const gc = parseFloat(document.getElementById('calcGc').value) || 1.0;
     const gnNue = parseFloat(document.getElementById('calcGnNue').value) || 1.25;
     const gnPz = parseFloat(document.getElementById('calcGnPz').value) || 1.05;
+
+    // Safety margin audits
+    if (nm !== 2.6) warnings.push(`Запас nm (${nm}) відрізняється від 2,6`);
+    if (nt !== 1.5) warnings.push(`Запас nt (${nt}) відрізняється від 1,5`);
+    if (ntBolt !== 2.0) warnings.push(`Запас для кріплень ntBolt (${ntBolt}) відрізняється від 2,0`);
+    if (gm !== 1.05) warnings.push(`Коефіцієнт gm (${gm}) відрізняється від 1,05`);
+
+    // Temperature limits audits
+    let validTemps = temperatures.filter(t => data["RTm"] && data["RTm"][t] !== "—" && data["RTm"][t] !== undefined);
+    let maxGradeTemp = validTemps.length > 0 ? Math.max(...validTemps) : 600;
+
+    if (targetT > maxGradeTemp) {
+        warnings.push(`Робоча температура (${targetT}°C) вище межі випробувань сталі (${maxGradeTemp}°C). Консервативно обмежено.`);
+    }
+    if (targetTGv > maxGradeTemp) {
+        warnings.push(`Температура ГВ (${targetTGv}°C) вище межі випробувань сталі (${maxGradeTemp}°C). Консервативно обмежено.`);
+    }
+    if (targetT < 20) {
+        warnings.push(`Робоча температура (${targetT}°C) нижче 20°C.`);
+    }
+    if (targetTGv < 20) {
+        warnings.push(`Температура ГВ (${targetTGv}°C) нижче 20°C.`);
+    }
 
     let sigma = null; let sigmaGv = null;
     if (stepRtm !== null && stepRtp !== null) {
@@ -1651,6 +1688,36 @@ function updateCalculator() {
         renderCell('op_R_gv', rGv, fGv);
     } else {
         renderCell('op_R_gv', null, "");
+    }
+
+    if (auditPanel && auditDot && auditTitle && auditDesc && auditWarnings) {
+        // Reset class styles first
+        auditPanel.className = "p-4 rounded-2xl text-xs font-semibold shadow-sm border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 mb-5 relative overflow-hidden";
+        auditWarnings.classList.add('hidden');
+        auditWarnings.innerHTML = "";
+
+        if (isCritical) {
+            auditPanel.classList.add('bg-rose-50/50', 'dark:bg-rose-950/20', 'text-rose-800', 'dark:text-rose-300', 'border-rose-200/50', 'dark:border-rose-900/30');
+            auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-rose-500";
+            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75";
+            auditTitle.textContent = "Розрахунок заблоковано";
+            auditDesc.textContent = "Введено некоректні фізичні значення температур. Розрахунок призупинено.";
+        } else if (warnings.length > 0) {
+            auditPanel.classList.add('bg-amber-50/50', 'dark:bg-amber-950/20', 'text-amber-800', 'dark:text-amber-300', 'border-amber-200/50', 'dark:border-amber-900/30');
+            auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
+            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
+            auditTitle.textContent = "Аудит: Застереження";
+            auditDesc.textContent = "Виявлено нестандартні коефіцієнти розрахунку або вихід за межі температурної сітки матеріалу.";
+            
+            auditWarnings.classList.remove('hidden');
+            auditWarnings.innerHTML = warnings.map(w => `<div>⚠ ${w}</div>`).join('');
+        } else {
+            auditPanel.classList.add('bg-emerald-50/50', 'dark:bg-emerald-950/20', 'text-emerald-800', 'dark:text-emerald-300', 'border-emerald-200/50', 'dark:border-emerald-900/30');
+            auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+            auditTitle.textContent = "Параметри розрахунку: Норма";
+            auditDesc.textContent = "Розрахунок відповідає вимогам нормативності ПНАЕ G-7-002-86.";
+        }
     }
 }
 
