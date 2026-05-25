@@ -36,7 +36,7 @@
                             500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
                         },
                         dark: {
-                            bg: '#0f172a', panel: '#1e293b', border: '#334155'
+                            bg: '#080b11', panel: '#111625', border: '#1e2640'
                         }
                     }
                 }
@@ -115,6 +115,12 @@
                             </div>
                         </div>
 
+                        <!-- Нещодавно переглянуті матеріали -->
+                        <div id="recentMaterialsWrapper" class="hidden border-b border-slate-100 dark:border-slate-700/60 pb-3">
+                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-2 ml-1 uppercase tracking-wider">Нещодавно переглянуті</label>
+                            <div id="recentMaterialsList" class="flex flex-wrap gap-1.5 ml-1"></div>
+                        </div>
+
                         <div>
                             <label for="materialSelect" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 ml-1">МАРКА СТАЛІ/СПЛАВУ</label>
                             <select id="materialSelect" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-medium text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block p-2.5 outline-none transition-all cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.2em;"></select>
@@ -174,7 +180,9 @@
                         <svg id="reportListToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     
-                    <div id="sidebarReportListWrapper" class="hidden flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
+                    <div id="sidebarReportListWrapper" class="accordion-wrapper pr-1 max-h-[35vh] overflow-y-auto">
+                        <div id="sidebarReportListInner" class="accordion-inner flex flex-col gap-2 pb-2">
+                        </div>
                     </div>
                 </div>
 
@@ -185,8 +193,53 @@
         <main class="flex-1 p-4 md:p-6 overflow-hidden relative">
             
             <div id="empty-state" class="hidden h-full flex-col items-center justify-center text-center p-8 modal-animate">
-                <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-5 shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 dark:text-slate-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+                <div class="relative flex items-center justify-center mb-6">
+                    <!-- Ambient pulsing glow -->
+                    <div class="absolute w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+                    <!-- Isometric 3D SVG Composition -->
+                    <svg width="130" height="130" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative z-10 animate-bounce" style="animation-duration: 4s; animation-iteration-count: infinite;">
+                         <!-- Base shadow shadow-glow -->
+                         <ellipse cx="60" cy="100" rx="30" ry="8" fill="rgba(0, 0, 0, 0.08)" />
+                         
+                         <!-- Grid backdrop -->
+                         <path d="M60 15 L95 38 L60 61 L25 38 Z" fill="url(#gridGrad)" opacity="0.6"/>
+                         
+                         <!-- Stack layers -->
+                         <!-- Bottom stack layer -->
+                         <path d="M30 70 L60 88 L90 70 L60 52 Z" fill="url(#bottomGrad)" />
+                         <path d="M30 70 L30 78 L60 96 L60 88 Z" fill="#312e81" />
+                         <path d="M60 88 L60 96 L90 78 L90 70 Z" fill="#3730a3" />
+                         
+                         <!-- Top stack layer -->
+                         <path d="M30 55 L60 73 L90 55 L60 37 Z" fill="url(#topGrad)" filter="drop-shadow(0px 8px 20px rgba(99, 102, 241, 0.25))" />
+                         <path d="M30 55 L30 63 L60 81 L60 73 Z" fill="#4338ca" />
+                         <path d="M60 73 L60 81 L90 63 L90 55 Z" fill="#4f46e5" />
+                         
+                         <!-- Mini database pillars -->
+                         <path d="M42 42 L52 48 L62 42 L52 36 Z" fill="#60a5fa" />
+                         <path d="M42 42 L42 47 L52 53 L52 48 Z" fill="#2563eb" />
+                         <path d="M52 48 L52 53 L62 47 L62 42 Z" fill="#3b82f6" />
+                         
+                         <!-- Floating bubbles/particles -->
+                         <circle cx="28" cy="30" r="4.5" fill="#818cf8" opacity="0.8" />
+                         <circle cx="92" cy="42" r="6" fill="#34d399" opacity="0.8" />
+                         <circle cx="60" cy="22" r="3.5" fill="#fb7185" opacity="0.8" />
+                         
+                         <defs>
+                             <linearGradient id="gridGrad" x1="25" y1="38" x2="95" y2="38" gradientUnits="userSpaceOnUse">
+                                 <stop stop-color="#818cf8" stop-opacity="0.1"/>
+                                 <stop offset="1" stop-color="#c084fc" stop-opacity="0.1"/>
+                             </linearGradient>
+                             <linearGradient id="topGrad" x1="30" y1="55" x2="90" y2="55" gradientUnits="userSpaceOnUse">
+                                 <stop stop-color="#6366f1"/>
+                                 <stop offset="1" stop-color="#a855f7"/>
+                             </linearGradient>
+                             <linearGradient id="bottomGrad" x1="30" y1="70" x2="90" y2="70" gradientUnits="userSpaceOnUse">
+                                 <stop stop-color="#4f46e5"/>
+                                 <stop offset="1" stop-color="#8b5cf6"/>
+                             </linearGradient>
+                         </defs>
+                    </svg>
                 </div>
                 <h2 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Немає даних для відображення</h2>
                 <p class="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Оберіть матеріал зі списку ліворуч або додайте новий матеріал власноруч.</p>
@@ -240,7 +293,7 @@
                 </div>
 
                 <!-- Вкладки (1, 2, 3, 4) -->
-                <div id="view-table" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden flex flex-col transition-opacity duration-200 self-start max-h-full w-full min-h-0">
+                <div id="view-table" class="tab-pane tab-active bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden flex flex-col self-start max-h-full w-full min-h-0">
                     <div class="table-container overflow-auto w-full relative">
                         <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
                             <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -251,7 +304,7 @@
                     </div>
                 </div>
 
-                <div id="view-calc" class="hidden flex-1 overflow-y-auto space-y-5 pb-6">
+                <div id="view-calc" class="tab-pane hidden flex-1 overflow-y-auto space-y-5 pb-6">
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-5">
                         <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                             <div class="shrink-0 w-full sm:w-32 flex flex-col gap-2">
@@ -304,7 +357,7 @@
 
                     <div class="grid grid-cols-1 gap-5">
                         <!-- Деталі -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                        <div class="fluent-card hover-zoom-card rounded-2xl border overflow-hidden">
                             <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
                                 <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
                                 <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Всі деталі (крім шпильок)</h3>
@@ -376,7 +429,7 @@
                         </div>
 
                         <!-- Шпильки -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                        <div class="fluent-card hover-zoom-card rounded-2xl border overflow-hidden">
                             <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
                                 <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
                                 <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Шпильки / Болти</h3>
@@ -448,7 +501,7 @@
                         </div>
 
                         <!-- Опори -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 overflow-hidden">
+                        <div class="fluent-card hover-zoom-card rounded-2xl border overflow-hidden">
                             <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
                                 <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
                                 <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Опорні конструкції</h3>
@@ -482,7 +535,7 @@
                     </div>
                 </div>
                 
-                <div id="view-chart" class="hidden flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 p-5 overflow-hidden flex flex-col">
+                <div id="view-chart" class="tab-pane hidden flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 p-5 overflow-hidden flex flex-col">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-2 h-6 bg-purple-500 rounded-full"></div>
                         <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Криві міцності</h3>
@@ -506,7 +559,7 @@
                     </div>
                 </div>
             
-                <div id="view-report" class="hidden overflow-y-auto overflow-x-hidden flex-col transition-opacity duration-200 self-start max-h-full w-full min-h-0 gap-5 scroll-smooth p-1">
+                <div id="view-report" class="tab-pane hidden overflow-y-auto overflow-x-hidden flex-col self-start max-h-full w-full min-h-0 gap-5 scroll-smooth p-1">
                     <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex justify-end items-center shrink-0">
                         <label class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 font-medium gap-3">
                             <span class="text-sm shrink-0">Показати формули</span>
@@ -528,13 +581,15 @@
                             </button>
                         </div>
                         
-                        <div id="reportTableWrapper" class="table-container overflow-x-auto w-full relative">
-                            <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
-                                <thead id="reportTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
-                                </thead>
-                                <tbody id="reportTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
-                                </tbody>
-                            </table>
+                        <div id="reportTableWrapper" class="accordion-wrapper expanded w-full">
+                            <div class="accordion-inner table-container overflow-x-auto w-full relative">
+                                <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
+                                    <thead id="reportTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
+                                    </thead>
+                                    <tbody id="reportTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -549,13 +604,15 @@
                             </button>
                         </div>
                         
-                        <div id="reportStressTableWrapper" class="table-container overflow-x-auto w-full relative">
-                            <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
-                                <thead id="reportStressTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
-                                </thead>
-                                <tbody id="reportStressTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
-                                </tbody>
-                            </table>
+                        <div id="reportStressTableWrapper" class="accordion-wrapper expanded w-full">
+                            <div class="accordion-inner table-container overflow-x-auto w-full relative">
+                                <table class="w-full text-sm text-left whitespace-nowrap border-separate border-spacing-0">
+                                    <thead id="reportStressTableHeader" class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900 sticky top-0 z-20">
+                                    </thead>
+                                    <tbody id="reportStressTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 

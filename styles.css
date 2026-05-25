@@ -223,3 +223,127 @@ td[data-temp-col] {
     transition: background-color 0.25s ease-out, color 0.25s ease-out;
 }
 
+/* Premium Dark Slate-Indigo Mode background override */
+html.dark body {
+    background-color: #080b11 !important;
+}
+
+/* Fluent Glassmorphic Cards */
+.fluent-card {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.8) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+html.dark .fluent-card {
+    background: rgba(17, 22, 37, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+}
+.fluent-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08) !important;
+}
+html.dark .fluent-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Tab Transitions */
+.tab-pane {
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(8px);
+}
+.tab-pane.tab-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Formula Variables Inspector & Tooltips */
+.formula-var {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dashed rgba(99, 102, 241, 0.6);
+    padding-bottom: 1px;
+    font-weight: 600;
+    transition: color 0.2s, border-color 0.2s;
+    color: inherit;
+}
+.formula-var:hover {
+    color: #4f46e5 !important;
+    border-bottom-color: #4f46e5;
+}
+html.dark .formula-var {
+    border-bottom-color: rgba(129, 140, 248, 0.6);
+}
+html.dark .formula-var:hover {
+    color: #818cf8 !important;
+    border-bottom-color: #818cf8;
+}
+.formula-tooltip {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    margin-bottom: 6px;
+    width: 220px;
+    padding: 8px 12px;
+    background: #0f172a;
+    color: #f1f5f9;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    font-weight: normal;
+    line-height: 1.4;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
+                0 0 1px 1px rgba(255, 255, 255, 0.1);
+    z-index: 99;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+html.dark .formula-tooltip {
+    background: #1e293b;
+    color: #f1f5f9;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
+                0 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+.formula-var:hover .formula-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+.formula-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #0f172a transparent transparent transparent;
+}
+html.dark .formula-tooltip::after {
+    border-color: #1e293b transparent transparent transparent;
+}
+
+/* Accordion transition styles */
+.accordion-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    opacity: 0;
+    overflow: hidden;
+}
+.accordion-wrapper.expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+.accordion-inner {
+    min-height: 0;
+}
