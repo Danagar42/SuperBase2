@@ -162,6 +162,7 @@ function saveToLocalStorage() {
         );
         localStorage.setItem('pnae_materials_custom', JSON.stringify(customMaterials)); 
         localStorage.setItem('pnae_favorites', JSON.stringify(favoriteMaterials));
+        localStorage.setItem('pnae_report_materials', JSON.stringify(reportMaterials));
     } catch (e) { console.error("Помилка збереження", e); }
 }
 
@@ -182,6 +183,10 @@ function loadFromLocalStorage() {
     const savedFavs = localStorage.getItem('pnae_favorites');
     if(savedFavs) {
         try { favoriteMaterials = JSON.parse(savedFavs); } catch(e){}
+    }
+    const savedReports = localStorage.getItem('pnae_report_materials');
+    if(savedReports) {
+        try { reportMaterials = JSON.parse(savedReports); } catch(e){}
     }
 }
 
@@ -273,12 +278,10 @@ function init() {
         const icon = document.getElementById('reportListToggleIcon');
         
         if (isReportListVisible) {
-            wrapper.classList.remove('hidden');
-            wrapper.classList.add('flex');
+            wrapper.classList.add('expanded');
             icon.classList.add('rotate-180');
         } else {
-            wrapper.classList.add('hidden');
-            wrapper.classList.remove('flex');
+            wrapper.classList.remove('expanded');
             icon.classList.remove('rotate-180');
         }
         renderReportList();
@@ -329,6 +332,7 @@ function init() {
             });
 
             renderReportList();
+            playFlyToReportAnimation();
             showToast('Матеріал додано до списку', 'success');
         }
     });
@@ -421,7 +425,10 @@ function switchTab(tab) {
     const activeClass = "flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm border border-slate-200/50 dark:border-slate-600 transition-all focus:outline-none whitespace-nowrap";
     const inactiveClass = "flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap";
 
-    [viewTable, viewCalc, viewChart, viewReport].forEach(v => v.classList.add('hidden'));
+    [viewTable, viewCalc, viewChart, viewReport].forEach(v => {
+        v.classList.add('hidden');
+        v.classList.remove('tab-active');
+    });
     [btnTable, btnCalc, btnChart, btnReport].forEach(b => b.className = inactiveClass);
 
     if (tab === 'report') {
@@ -450,36 +457,51 @@ function switchTab(tab) {
         headerReportInfo.classList.remove('flex');
     }
 
+    let activeView = null;
     if (tab === 'table') {
-        viewTable.classList.remove('hidden');
+        activeView = viewTable;
         btnTable.className = activeClass;
     } else if (tab === 'calc') {
-        viewCalc.classList.remove('hidden');
+        activeView = viewCalc;
         btnCalc.className = activeClass;
         updateCalculator();
     } else if (tab === 'chart') {
-        viewChart.classList.remove('hidden');
+        activeView = viewChart;
         btnChart.className = activeClass;
         renderChart();
     } else if (tab === 'report') {
-        viewReport.classList.remove('hidden');
-        viewReport.classList.add('flex');
+        activeView = viewReport;
         btnReport.className = activeClass;
         renderReportList();
+    }
+
+    if (activeView) {
+        activeView.classList.remove('hidden');
+        if (tab === 'report') {
+            activeView.classList.add('flex');
+        }
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                activeView.classList.add('tab-active');
+            });
+        });
     }
 }
 
 function renderReportList() {
+    saveToLocalStorage();
     const listWrapper = document.getElementById('sidebarReportListWrapper');
+    const listInner = document.getElementById('sidebarReportListInner');
     const toggleText = document.getElementById('reportListToggleText');
+    if (!listInner) return;
     
-    const isVisible = !listWrapper.classList.contains('hidden');
+    const isVisible = listWrapper.classList.contains('expanded');
     const count = reportMaterials.length;
     
     toggleText.textContent = isVisible ? `Сховати список (${count})` : `Показати список (${count})`;
     
     if (count === 0) {
-        listWrapper.innerHTML = `
+        listInner.innerHTML = `
             <div class="text-center p-4 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
                 <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Список порожній</p>
             </div>`;
@@ -487,7 +509,7 @@ function renderReportList() {
         return;
     }
     
-    listWrapper.innerHTML = reportMaterials.map((item, index) => `
+    listInner.innerHTML = reportMaterials.map((item, index) => `
         <div class="report-list-item flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm mb-2 last:mb-0 cursor-move transition-colors" draggable="true" data-index="${index}" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)">
             <div class="flex items-center gap-3 overflow-hidden pointer-events-none">
                 <div class="text-slate-400 dark:text-slate-500 shrink-0">
@@ -894,8 +916,9 @@ function renderReportStressTable() {
                     } else {
                         let valStr = String(val).replace('.', ',');
                         if (isReportDevMode && formula !== "") {
+                            const wrappedFormula = wrapFormulaVars(formula);
                             displayValue = `
-                                <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formula}">${formula}</div>
+                                <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formula}">${wrappedFormula}</div>
                                 <div class="font-bold ${isGv ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'} text-base">${valStr}</div>
                             `;
                         } else {
@@ -924,10 +947,10 @@ window.toggleReportTable = function() {
     const icon = document.getElementById('reportTableToggleIcon');
     
     if (isReportTableVisible) {
-        wrapper.classList.remove('hidden');
+        wrapper.classList.add('expanded');
         icon.classList.add('rotate-180');
     } else {
-        wrapper.classList.add('hidden');
+        wrapper.classList.remove('expanded');
         icon.classList.remove('rotate-180');
     }
 };
@@ -939,10 +962,10 @@ window.toggleReportStressTable = function() {
     const icon = document.getElementById('reportStressTableToggleIcon');
     
     if (isReportStressTableVisible) {
-        wrapper.classList.remove('hidden');
+        wrapper.classList.add('expanded');
         icon.classList.add('rotate-180');
     } else {
-        wrapper.classList.add('hidden');
+        wrapper.classList.remove('expanded');
         icon.classList.remove('rotate-180');
     }
 };
@@ -1047,6 +1070,8 @@ function updateKpList() {
     el.kp.innerHTML = '';
     const matIndex = el.mat.value;
     if(!appMaterials[matIndex]) return;
+    
+    addToRecentViews(appMaterials[matIndex].name);
     
     appMaterials[matIndex].grades.forEach((grade, index) => {
         const option = document.createElement('option');
@@ -1299,6 +1324,119 @@ function highlightActiveColumn(activeTemp) {
     });
 }
 
+const VAR_DEFINITIONS = {
+    'R<sup>T</sup><sub>m</sub>': '<strong>R<sup>T</sup><sub>m</sub></strong>: Значення тимчасового опору для вибраної марки при даній температурі (з бази даних).',
+    'R<sup>T</sup><sub>m(ГВ)</sub>': '<strong>R<sup>T</sup><sub>m(ГВ)</sub></strong>: Тимчасовий опір при температурі гідровипробувань.',
+    'R<sup>T</sup><sub>p0,2</sub>': '<strong>R<sup>T</sup><sub>p0,2</sub></strong>: Межа текучості при робочій температурі (з бази даних).',
+    'R<sup>T</sup><sub>p0,2(ГВ)</sub>': '<strong>R<sup>T</sup><sub>p0,2(ГВ)</sub></strong>: Межа текучості при температурі гідровипробувань.',
+    'n<sub>m</sub>': '<strong>n<sub>m</sub></strong>: Коефіцієнт запасу міцності за тимчасовим опором (за ПНАЕ = 2.6).',
+    'n<sub>0,2</sub>': '<strong>n<sub>0,2</sub></strong>: Коефіцієнт запасу міцності за межею текучості (за ПНАЕ = 1.5).',
+    'n<sub>0,2(болти)</sub>': '<strong>n<sub>0,2(болти)</sub></strong>: Запас міцності для кріплення (за ПНАЕ = 2.0).',
+    '&gamma;<sub>m</sub>': '<strong>&gamma;<sub>m</sub></strong>: Коефіцієнт надійності за матеріалом (за замовчуванням = 1.05).',
+    '&gamma;<sub>c</sub>': '<strong>&gamma;<sub>c</sub></strong>: Коефіцієнт умов роботи (за замовчуванням = 1.0).',
+    '&gamma;<sub>n(НУЕ)</sub>': '<strong>&gamma;<sub>n(НУЕ)</sub></strong>: Коефіцієнт надійності за призначенням для нормальних умов (1.25).',
+    '&gamma;<sub>n(ПЗ)</sub>': '<strong>&gamma;<sub>n(ПЗ)</sub></strong>: Коефіцієнт надійності за призначенням для сейсмічності (1.05).',
+    'R<sub>y</sub>': '<strong>R<sub>y</sub></strong>: Розрахунковий опір матеріалу для опорних конструкцій.',
+    'R<sub>y(ГВ)</sub>': '<strong>R<sub>y(ГВ)</sub></strong>: Розрахунковий опір при температурі гідровипробувань.',
+    '[σ]': '<strong>[σ]</strong>: Базове допустиме напруження для робочого стану конструкції.',
+    '[σ]<sub>w</sub>': '<strong>[σ]<sub>w</sub></strong>: Базове допустиме напруження для шпильок/болтів.',
+    '[σ]<sub>ГВ</sub>': '<strong>[σ]<sub>ГВ</sub></strong>: Базове допустиме напруження в режимі гідровипробувань.'
+};
+
+function wrapFormulaVars(formulaStr) {
+    if (!formulaStr) return formulaStr;
+    let res = formulaStr;
+    
+    for (let key in VAR_DEFINITIONS) {
+        const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(escapedKey, 'g');
+        const tooltipHtml = `<span class="formula-var">${key}<span class="formula-tooltip">${VAR_DEFINITIONS[key]}</span></span>`;
+        res = res.replace(regex, tooltipHtml);
+    }
+    return res;
+}
+
+let recentViews = [];
+
+function addToRecentViews(matName) {
+    if (!matName) return;
+    const cleanName = matName.replace('★ ', '').trim();
+    
+    const idx = recentViews.indexOf(cleanName);
+    if (idx > -1) {
+        recentViews.splice(idx, 1);
+    }
+    
+    recentViews.unshift(cleanName);
+    
+    if (recentViews.length > 5) {
+        recentViews.pop();
+    }
+    
+    renderRecentViews();
+}
+
+function renderRecentViews() {
+    const wrapper = document.getElementById('recentMaterialsWrapper');
+    const container = document.getElementById('recentMaterialsList');
+    if (!wrapper || !container) return;
+    
+    if (recentViews.length === 0) {
+        wrapper.classList.add('hidden');
+        return;
+    }
+    
+    wrapper.classList.remove('hidden');
+    
+    container.innerHTML = recentViews.map(name => `
+        <button type="button" onclick="selectRecentMaterial('${name}')" class="text-[10px] font-semibold px-2 py-1 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-slate-800 dark:hover:bg-brand-900/30 dark:hover:text-brand-400 text-slate-600 dark:text-slate-400 rounded-md border border-slate-200/50 dark:border-slate-700/50 transition-all truncate max-w-[120px]" title="${name}">
+            ${name}
+        </button>
+    `).join('');
+}
+
+window.selectRecentMaterial = function(name) {
+    const allOptions = Array.from(el.mat.options);
+    const opt = allOptions.find(o => o.textContent.replace('★ ', '').trim() === name);
+    if (opt) {
+        el.mat.value = opt.value;
+        updateKpList();
+    }
+};
+
+function playFlyToReportAnimation() {
+    const btnAdd = document.getElementById('btnAddToReport');
+    const tabReport = document.getElementById('tab-btn-report');
+    if (!btnAdd || !tabReport) return;
+
+    const startRect = btnAdd.getBoundingClientRect();
+    const endRect = tabReport.getBoundingClientRect();
+
+    const dot = document.createElement('div');
+    dot.className = 'fixed bg-indigo-600 dark:bg-indigo-500 rounded-full z-[999] pointer-events-none shadow-lg brand-glow transition-all duration-700 ease-in-out';
+    dot.style.width = '16px';
+    dot.style.height = '16px';
+    dot.style.left = `${startRect.left + startRect.width / 2 - 8}px`;
+    dot.style.top = `${startRect.top + startRect.height / 2 - 8}px`;
+    dot.style.transform = 'scale(1)';
+    dot.style.opacity = '1';
+
+    document.body.appendChild(dot);
+
+    requestAnimationFrame(() => {
+        dot.style.transform = `translate(${endRect.left - startRect.left + endRect.width / 2}px, ${endRect.top - startRect.top + endRect.height / 2}px) scale(0.2)`;
+        dot.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+        dot.remove();
+        tabReport.classList.add('scale-110', 'text-indigo-600', 'dark:text-indigo-400');
+        setTimeout(() => {
+            tabReport.classList.remove('scale-110', 'text-indigo-600', 'dark:text-indigo-400');
+        }, 300);
+    }, 700);
+}
+
 function renderCell(id, value, formulaStr) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1311,8 +1449,9 @@ function renderCell(id, value, formulaStr) {
     const valStr = roundExcel(value, 2).replace('.', ',');
 
     if (isDevMode) {
+        const wrappedFormula = wrapFormulaVars(formulaStr);
         el.innerHTML = `
-            <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formulaStr}">${formulaStr}</div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium">${wrappedFormula}</div>
             <div class="text-base leading-tight font-semibold">${valStr}</div>
         `;
     } else {
