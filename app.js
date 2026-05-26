@@ -80,6 +80,17 @@ function roundExcel(num, places = 2) {
     return (Math.round((num + Number.EPSILON) * multiplier) / multiplier).toFixed(places);
 }
 
+// Допоміжна функція для форматування окремих характеристик з 2 знаками після коми
+function formatPropertyValue(key, value) {
+    if (value === "—" || value === "" || value === undefined || value === null) return "—";
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+    if (key === "Ro" || key === "Alpha" || key === "Mu") {
+        return roundExcel(num, 2);
+    }
+    return value;
+}
+
 function escapeHTML(str) {
     if (typeof str !== 'string') return str;
     return str.replace(/[&<>'"]/g, tag => ({
@@ -1122,7 +1133,13 @@ function renderTable() {
 
         const propData = data[prop.key];
         temperatures.forEach(t => {
-            const value = propData && propData[t] !== undefined && propData[t] !== null && propData[t] !== '' ? propData[t] : '—';
+            let value = propData && propData[t] !== undefined && propData[t] !== null && propData[t] !== '' ? propData[t] : '—';
+            
+            // Застосовуємо форматування до 2 знаків після коми для густини, коефіцієнта розширення та Пуассона
+            if (value !== '—') {
+                value = formatPropertyValue(prop.key, value);
+            }
+            
             let safeValue = escapeHTML(String(value));
             if (safeValue !== '—') safeValue = safeValue.replace('.', ',');
             const displayValue = safeValue === '—' 
@@ -2106,8 +2123,15 @@ function openEditModal() {
     propertiesList.forEach(prop => {
         temperatures.forEach(t => {
             const input = document.querySelector(`#newMatTableBody input[data-prop="${prop.key}"][data-temp="${t}"]`);
-            const val = grade.data[prop.key]?.[t];
+            let val = grade.data[prop.key]?.[t];
             if (input && val !== "—" && val !== undefined) {
+                // Забезпечуємо відображення 2 знаків після коми при відкритті форми редагування
+                if (prop.key === "Ro" || prop.key === "Alpha" || prop.key === "Mu") {
+                    const num = parseFloat(val);
+                    if (!isNaN(num)) {
+                        val = roundExcel(num, 2);
+                    }
+                }
                 input.value = val;
             }
         });
