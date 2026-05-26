@@ -866,7 +866,7 @@ function renderReportStressTable() {
                 }
 
                 html += `<td class="py-2.5 px-4 text-sm border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700">
-                        <span class="inline-block text-slate-700 dark:text-slate-200 font-bold bg-white dark:bg-slate-900 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
+                        <span class="inline-block text-slate-400 dark:text-slate-500 font-normal bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
                     </td>`;
 
                 reportTemperatures.forEach((t, tIdx) => {
