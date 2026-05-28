@@ -1655,12 +1655,19 @@ function updateCalculator() {
         renderCell('bolt_s4w_pz', null, ""); renderCell('bolt_s4w_mrz', null, "");
 
         renderCell('bolt_ssmw_nue', null, ""); renderCell('bolt_ssmw_pnue', null, ""); 
-        renderCell('bolt_ssmw_pz', sigmaW * PNAE_COEFS.bolt_ssmw_pz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_pz}`);
-        renderCell('bolt_ssmw_mrz', sigmaW * PNAE_COEFS.bolt_ssmw_mrz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_mrz}`);
-
         renderCell('bolt_ss4w_nue', null, ""); renderCell('bolt_ss4w_pnue', null, ""); 
-        renderCell('bolt_ss4w_pz', sigmaW * PNAE_COEFS.bolt_ss4w_pz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ss4w_pz}`);
-        renderCell('bolt_ss4w_mrz', sigmaW * PNAE_COEFS.bolt_ss4w_mrz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ss4w_mrz}`);
+
+        if (seismicCategory === '1') {
+            renderCell('bolt_ssmw_pz', sigmaW * PNAE_COEFS.bolt_ssmw_pz_cat1, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_pz_cat1}`);
+            renderCell('bolt_ssmw_mrz', sigmaW * PNAE_COEFS.bolt_ssmw_mrz_cat1, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_mrz_cat1}`);
+            renderCell('bolt_ss4w_pz', sigmaW * PNAE_COEFS.bolt_ss4w_pz_cat1, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ss4w_pz_cat1}`);
+            renderCell('bolt_ss4w_mrz', sigmaW * PNAE_COEFS.bolt_ss4w_mrz_cat1, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ss4w_mrz_cat1}`);
+        } else if (seismicCategory === '2') {
+            renderCell('bolt_ssmw_pz', sigmaW * PNAE_COEFS.bolt_ssmw_pz_cat2, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_pz_cat2}`);
+            renderCell('bolt_ssmw_mrz', null, "");
+            renderCell('bolt_ss4w_pz', sigmaW * PNAE_COEFS.bolt_ss4w_pz_cat2, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ss4w_pz_cat2}`);
+            renderCell('bolt_ss4w_mrz', null, "");
+        }
 
         renderCell('bolt_ts_nue', null, ""); renderCell('bolt_ts_pnue', null, ""); 
         renderCell('bolt_ts_pz', sigmaW * PNAE_COEFS.bolt_ts_pz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ts_pz}`);
