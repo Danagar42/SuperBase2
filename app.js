@@ -359,6 +359,13 @@ function init() {
     document.getElementById('btnApplyCoef').addEventListener('click', closeCoefModal);
     document.getElementById('coefModalBackdrop').addEventListener('click', closeCoefModal);
 
+    const equipPropsModal = document.getElementById('equipPropsModal');
+    const closeEquipPropsModal = () => equipPropsModal.classList.add('hidden');
+    document.getElementById('btnToggleEquipProps').addEventListener('click', () => equipPropsModal.classList.remove('hidden'));
+    document.getElementById('btnCloseEquipProps').addEventListener('click', closeEquipPropsModal);
+    document.getElementById('btnApplyEquipProps').addEventListener('click', closeEquipPropsModal);
+    document.getElementById('equipPropsModalBackdrop').addEventListener('click', closeEquipPropsModal);
+
     initAddMaterialModal();
     
     let isReportListVisible = false;
