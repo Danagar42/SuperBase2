@@ -1,0 +1,147 @@
+/* Кастомні стилі для шпаргалки лінеаризації */
+
+body {
+    background-color: #f8fafc;
+    transition: background-color 0.3s, color 0.3s;
+}
+html.dark body {
+    background-color: #080b11;
+}
+
+::-webkit-scrollbar { height: 8px; width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+html.dark ::-webkit-scrollbar-thumb { background: #475569; border: 2px solid transparent; background-clip: content-box; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Drag and Drop styles */
+tr.dragging {
+    opacity: 0.5;
+    background-color: rgba(99, 102, 241, 0.15) !important;
+    border: 2px dashed #6366f1 !important;
+}
+tr.drag-over-top {
+    border-top: 2px solid #6366f1 !important;
+}
+tr.drag-over-bottom {
+    border-bottom: 2px solid #6366f1 !important;
+}
+
+/* Excel-Style Cell Selection & Stress Columns Style */
+.col-s {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-size: 0.95rem !important; /* Bigger, clearer font (~15px) instead of text-xs */
+    font-weight: 600 !important;   /* Semibold for ultra sharpness */
+    color: #1e293b !important;     /* Slate-800 for superb contrast in light mode */
+    letter-spacing: 0.03em;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+html.dark .col-s {
+    color: #f1f5f9 !important;     /* Slate-100 for maximum readability in dark mode */
+}
+
+/* Beautiful & highly proportional subscripts */
+.col-s sub {
+    font-size: 0.72em !important;
+    bottom: -0.12em !important;
+    font-weight: 700 !important;
+    color: #4f46e5;                /* Distinct indigo accent in light mode */
+    position: relative;
+    vertical-align: baseline;
+    line-height: 0;
+}
+
+html.dark .col-s sub {
+    color: #a5b4fc;                /* Light-indigo accent in dark mode */
+}
+
+/* Styled abbreviation tooltips (tt) */
+.col-s .tt {
+    border-bottom: 1.5px dotted rgba(99, 102, 241, 0.6);
+    padding-bottom: 1px;
+    cursor: help;
+    transition: all 0.2s ease;
+}
+
+html.dark .col-s .tt {
+    border-bottom: 1.5px dotted rgba(165, 180, 252, 0.6);
+}
+
+.col-s .tt:hover {
+    color: #4f46e5 !important;
+    border-bottom-color: #4f46e5;
+    border-bottom-style: dashed;
+}
+
+html.dark .col-s .tt:hover {
+    color: #c7d2fe !important;
+    border-bottom-color: #c7d2fe;
+    border-bottom-style: dashed;
+}
+
+/* Active Excel Cell Selection */
+.col-s.cell-selected {
+    background-color: #e0e7ff !important;
+    box-shadow: inset 0 0 0 2px #6366f1 !important;
+    color: #1e3a8a !important;
+    position: relative;
+    z-index: 5;
+}
+
+.col-s.cell-selected sub {
+    color: #1e3a8a !important;
+}
+
+html.dark .col-s.cell-selected {
+    background-color: rgba(99, 102, 241, 0.25) !important;
+    box-shadow: inset 0 0 0 2px #818cf8 !important;
+    color: #e0e7ff !important;
+}
+
+html.dark .col-s.cell-selected sub {
+    color: #e0e7ff !important;
+}
+
+/* Fluent Glassmorphic Cards */
+.fluent-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.8) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+html.dark .fluent-card {
+    background: rgba(17, 22, 37, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Glassmorphism Header */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+html.dark .glass-panel {
+    background: rgba(8, 11, 17, 0.75) !important;
+    border-color: #1e2640 !important;
+}
+
+.brand-glow {
+    box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.08);
+}
+html.dark .brand-glow {
+    box-shadow: 0 4px 25px -2px rgba(99, 102, 241, 0.18);
+}
+
+/* Custom Tooltip Arrow */
+.tooltip-arrow::after {
+    content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+    border-width: 5px; border-style: solid; border-color: #0f172a transparent transparent transparent;
+}
+html.dark .tooltip-arrow::after { border-color: #1e293b transparent transparent transparent; }

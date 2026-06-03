@@ -68,6 +68,17 @@ let favoriteMaterials = [];
 let reportMaterials = [];
 let reportTemperatures = [20, 50, 100, 150];
 
+// Equipment report sub-tab state
+let activeReportSubTab = 'gaskets';
+let reportMaterialsEquip = [];
+let equipmentActiveProperties = ['RTm', 'RTp'];
+let equipmentStressColumns = [
+    { mode: 'gv', temp: 20 },
+    { mode: 'nue', temp: 20 },
+    { mode: 'pnue', temp: 20 }
+];
+let reportEquipSeismicVal = '1';
+
 const el = {
     search: document.getElementById('searchInput'),
     mat: document.getElementById('materialSelect'),
@@ -179,6 +190,12 @@ function saveToLocalStorage() {
         localStorage.setItem('pnae_materials_custom', JSON.stringify(customMaterials)); 
         localStorage.setItem('pnae_favorites', JSON.stringify(favoriteMaterials));
         localStorage.setItem('pnae_report_materials', JSON.stringify(reportMaterials));
+        
+        localStorage.setItem('pnae_active_report_subtab', activeReportSubTab);
+        localStorage.setItem('pnae_report_materials_equip', JSON.stringify(reportMaterialsEquip));
+        localStorage.setItem('pnae_equipment_active_properties', JSON.stringify(equipmentActiveProperties));
+        localStorage.setItem('pnae_equipment_stress_columns', JSON.stringify(equipmentStressColumns));
+        localStorage.setItem('pnae_report_equip_seismic', reportEquipSeismicVal);
     } catch (e) { console.error("Помилка збереження", e); }
 }
 
@@ -203,6 +220,29 @@ function loadFromLocalStorage() {
     const savedReports = localStorage.getItem('pnae_report_materials');
     if(savedReports) {
         try { reportMaterials = JSON.parse(savedReports); } catch(e){}
+    }
+    
+    const savedSubtab = localStorage.getItem('pnae_active_report_subtab');
+    if (savedSubtab) activeReportSubTab = savedSubtab;
+    
+    const savedReportsEquip = localStorage.getItem('pnae_report_materials_equip');
+    if(savedReportsEquip) {
+        try { reportMaterialsEquip = JSON.parse(savedReportsEquip); } catch(e){}
+    }
+    
+    const savedEquipProps = localStorage.getItem('pnae_equipment_active_properties');
+    if(savedEquipProps) {
+        try { equipmentActiveProperties = JSON.parse(savedEquipProps); } catch(e){}
+    }
+    
+    const savedEquipCols = localStorage.getItem('pnae_equipment_stress_columns');
+    if(savedEquipCols) {
+        try { equipmentStressColumns = JSON.parse(savedEquipCols); } catch(e){}
+    }
+
+    const savedEquipSeismic = localStorage.getItem('pnae_report_equip_seismic');
+    if(savedEquipSeismic) {
+        reportEquipSeismicVal = savedEquipSeismic;
     }
 }
 
@@ -275,8 +315,42 @@ function init() {
     });
 
     document.getElementById('reportDevModeToggle').addEventListener('change', () => {
-        renderReportStressTable();
+        if (activeReportSubTab === 'gaskets') {
+            renderReportStressTable();
+        } else {
+            renderReportStressTableEquip();
+        }
     });
+
+    // Equipment properties checklist listeners
+    document.querySelectorAll('.equip-prop-cb').forEach(cb => {
+        cb.addEventListener('change', () => {
+            equipmentActiveProperties = Array.from(document.querySelectorAll('.equip-prop-cb:checked')).map(c => c.value);
+            saveToLocalStorage();
+            renderReportTableEquip();
+        });
+    });
+
+    // Equipment seismic selector listener
+    const reportEquipSeismic = document.getElementById('reportEquipSeismic');
+    if (reportEquipSeismic) {
+        reportEquipSeismic.addEventListener('change', (e) => {
+            reportEquipSeismicVal = e.target.value;
+            saveToLocalStorage();
+            renderReportStressTableEquip();
+        });
+    }
+
+    // Restore checkbox states from loaded state
+    document.querySelectorAll('.equip-prop-cb').forEach(cb => {
+        cb.checked = equipmentActiveProperties.includes(cb.value);
+    });
+    if (reportEquipSeismic) {
+        reportEquipSeismic.value = reportEquipSeismicVal;
+    }
+
+    // Switch to active sub-tab to draw initial tables
+    switchReportSubTab(activeReportSubTab);
 
     const coefModal = document.getElementById('coefModal');
     const closeCoefModal = () => coefModal.classList.add('hidden');
@@ -313,43 +387,77 @@ function init() {
         const kpIndex = el.kp.value;
         if (matIndex === "" || kpIndex === "") return;
         
-        const selectedElements = Array.from(document.querySelectorAll('.report-element-cb:checked')).map(cb => cb.value);
-        if (selectedElements.length === 0) {
-            showToast('Оберіть хоча б один елемент (Фланець, Шпильки, Різьба)', 'warning');
-            return;
-        }
-
         const material = appMaterials[matIndex];
         const grade = material.grades[kpIndex];
         const matName = material.name;
         const kpName = grade.kp ? `КП ${grade.kp}` : 'Без КП';
-        
-        const existingIndex = reportMaterials.findIndex(m => m.matIndex == matIndex && m.kpIndex == kpIndex);
-        
-        if (existingIndex !== -1) {
-            const existingItem = reportMaterials[existingIndex];
-            const oldElementsStr = existingItem.elements.join(', ');
-            const newElementsStr = selectedElements.join(', ');
+
+        if (activeReportSubTab === 'gaskets') {
+            const selectedElements = Array.from(document.querySelectorAll('.report-element-cb:checked')).map(cb => cb.value);
+            if (selectedElements.length === 0) {
+                showToast('Оберіть хоча б один елемент (Фланець, Шпильки, Різьба)', 'warning');
+                return;
+            }
+            const existingIndex = reportMaterials.findIndex(m => m.matIndex == matIndex && m.kpIndex == kpIndex);
             
-            if (oldElementsStr === newElementsStr) {
-                showToast('Цей матеріал з такими елементами вже у списку!', 'warning');
+            if (existingIndex !== -1) {
+                const existingItem = reportMaterials[existingIndex];
+                const oldElementsStr = existingItem.elements.join(', ');
+                const newElementsStr = selectedElements.join(', ');
+                
+                if (oldElementsStr === newElementsStr) {
+                    showToast('Цей матеріал з такими елементами вже у списку!', 'warning');
+                } else {
+                    existingItem.elements = selectedElements;
+                    renderReportList();
+                    showToast('Елементи для матеріалу оновлено', 'success');
+                }
             } else {
-                existingItem.elements = selectedElements;
+                reportMaterials.push({ matIndex, kpIndex, matName, kpName, elements: selectedElements });
+                
+                reportMaterials.sort((a, b) => {
+                    const nameCmp = a.matName.localeCompare(b.matName, 'uk');
+                    if (nameCmp !== 0) return nameCmp;
+                    return a.kpName.localeCompare(b.kpName, 'uk');
+                });
+
                 renderReportList();
-                showToast('Елементи для матеріалу оновлено', 'success');
+                playFlyToReportAnimation();
+                showToast('Матеріал додано до списку', 'success');
             }
         } else {
-            reportMaterials.push({ matIndex, kpIndex, matName, kpName, elements: selectedElements });
+            const selectedElements = Array.from(document.querySelectorAll('.report-element-equip-cb:checked')).map(cb => cb.value);
+            if (selectedElements.length === 0) {
+                showToast('Оберіть хоча б один елемент (Всі деталі, Зварювальні матеріали, Шпильки, Опора)', 'warning');
+                return;
+            }
+            const existingIndex = reportMaterialsEquip.findIndex(m => m.matIndex == matIndex && m.kpIndex == kpIndex);
             
-            reportMaterials.sort((a, b) => {
-                const nameCmp = a.matName.localeCompare(b.matName, 'uk');
-                if (nameCmp !== 0) return nameCmp;
-                return a.kpName.localeCompare(b.kpName, 'uk');
-            });
+            if (existingIndex !== -1) {
+                const existingItem = reportMaterialsEquip[existingIndex];
+                const oldElementsStr = existingItem.elements.join(', ');
+                const newElementsStr = selectedElements.join(', ');
+                
+                if (oldElementsStr === newElementsStr) {
+                    showToast('Цей матеріал з такими елементами вже у списку обладнання!', 'warning');
+                } else {
+                    existingItem.elements = selectedElements;
+                    renderReportList();
+                    showToast('Елементи для матеріалу оновлено', 'success');
+                }
+            } else {
+                reportMaterialsEquip.push({ matIndex, kpIndex, matName, kpName, elements: selectedElements });
+                
+                reportMaterialsEquip.sort((a, b) => {
+                    const nameCmp = a.matName.localeCompare(b.matName, 'uk');
+                    if (nameCmp !== 0) return nameCmp;
+                    return a.kpName.localeCompare(b.kpName, 'uk');
+                });
 
-            renderReportList();
-            playFlyToReportAnimation();
-            showToast('Матеріал додано до списку', 'success');
+                renderReportList();
+                playFlyToReportAnimation();
+                showToast('Матеріал додано до списку обладнання', 'success');
+            }
         }
     });
 
@@ -512,7 +620,8 @@ function renderReportList() {
     if (!listInner) return;
     
     const isVisible = listWrapper.classList.contains('expanded');
-    const count = reportMaterials.length;
+    const activeList = activeReportSubTab === 'gaskets' ? reportMaterials : reportMaterialsEquip;
+    const count = activeList.length;
     
     toggleText.textContent = isVisible ? `Сховати список (${count})` : `Показати список (${count})`;
     
@@ -521,11 +630,15 @@ function renderReportList() {
             <div class="text-center p-4 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
                 <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Список порожній</p>
             </div>`;
-        renderReportTable();
+        if (activeReportSubTab === 'gaskets') {
+            renderReportTable();
+        } else {
+            renderReportTableEquip();
+        }
         return;
     }
     
-    listInner.innerHTML = reportMaterials.map((item, index) => `
+    listInner.innerHTML = activeList.map((item, index) => `
         <div class="report-list-item flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm mb-2 last:mb-0 cursor-move transition-colors" draggable="true" data-index="${index}" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)">
             <div class="flex items-center gap-3 overflow-hidden pointer-events-none">
                 <div class="text-slate-400 dark:text-slate-500 shrink-0">
@@ -546,7 +659,11 @@ function renderReportList() {
         </div>
     `).join('');
 
-    renderReportTable();
+    if (activeReportSubTab === 'gaskets') {
+        renderReportTable();
+    } else {
+        renderReportTableEquip();
+    }
 }
 
 // --- Drag & Drop функції для списку звітів ---
@@ -588,8 +705,9 @@ window.handleDrop = function(e) {
         target.classList.remove('scale-[1.02]', 'bg-brand-50', 'dark:bg-brand-900/30', 'border-brand-400');
         const targetIndex = parseInt(target.dataset.index);
         if (draggedReportIndex !== null && draggedReportIndex !== targetIndex) {
-            const item = reportMaterials.splice(draggedReportIndex, 1)[0];
-            reportMaterials.splice(targetIndex, 0, item);
+            const activeList = activeReportSubTab === 'gaskets' ? reportMaterials : reportMaterialsEquip;
+            const item = activeList.splice(draggedReportIndex, 1)[0];
+            activeList.splice(targetIndex, 0, item);
             renderReportList();
         }
     }
@@ -602,7 +720,8 @@ window.handleDragEnd = function(e) {
 };
 
 window.removeReportItem = function(index) {
-    reportMaterials.splice(index, 1);
+    const activeList = activeReportSubTab === 'gaskets' ? reportMaterials : reportMaterialsEquip;
+    activeList.splice(index, 1);
     renderReportList();
 };
 
@@ -2437,5 +2556,497 @@ document.addEventListener('copy', (e) => {
         }, 100); 
     });
 });
+
+window.switchReportSubTab = function(tab) {
+    activeReportSubTab = tab;
+    const btnGaskets = document.getElementById('btnReportSubTabGaskets');
+    const btnEquip = document.getElementById('btnReportSubTabEquipment');
+    const contentGaskets = document.getElementById('report-content-gaskets');
+    const contentEquip = document.getElementById('report-content-equipment');
+    const actionsGaskets = document.getElementById('reportActionsGaskets');
+    const actionsEquipment = document.getElementById('reportActionsEquipment');
+
+    if (tab === 'gaskets') {
+        btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
+        btnEquip.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
+        contentGaskets.classList.remove('hidden');
+        contentEquip.classList.add('hidden');
+        actionsGaskets.classList.remove('hidden');
+        actionsEquipment.classList.add('hidden');
+    } else {
+        btnEquip.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
+        btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
+        contentGaskets.classList.add('hidden');
+        contentEquip.classList.remove('hidden');
+        actionsGaskets.classList.add('hidden');
+        actionsEquipment.classList.remove('hidden');
+    }
+
+    saveToLocalStorage();
+    renderReportList();
+};
+
+let isReportTableEquipVisible = true;
+window.toggleReportTableEquip = function() {
+    isReportTableEquipVisible = !isReportTableEquipVisible;
+    const wrapper = document.getElementById('reportTableEquipWrapper');
+    const icon = document.getElementById('reportTableEquipToggleIcon');
+    
+    if (isReportTableEquipVisible) {
+        wrapper.classList.add('expanded');
+        icon.classList.add('rotate-180');
+    } else {
+        wrapper.classList.remove('expanded');
+        icon.classList.remove('rotate-180');
+    }
+};
+
+let isReportStressTableEquipVisible = true;
+window.toggleReportStressTableEquip = function() {
+    isReportStressTableEquipVisible = !isReportStressTableEquipVisible;
+    const wrapper = document.getElementById('reportStressTableEquipWrapper');
+    const icon = document.getElementById('reportStressTableEquipToggleIcon');
+    
+    if (isReportStressTableEquipVisible) {
+        wrapper.classList.add('expanded');
+        icon.classList.add('rotate-180');
+    } else {
+        wrapper.classList.remove('expanded');
+        icon.classList.remove('rotate-180');
+    }
+};
+
+window.addEquipmentStressColumn = function() {
+    const mode = document.getElementById('equipAddColumnMode').value;
+    const temp = parseFloat(document.getElementById('equipAddColumnTemp').value);
+    
+    const exists = equipmentStressColumns.some(col => col.mode === mode && col.temp === temp);
+    if (exists) {
+        showToast('Такий стовпець вже додано!', 'warning');
+        return;
+    }
+    
+    equipmentStressColumns.push({ mode, temp });
+    
+    // Sort columns by temperature to keep it organized
+    equipmentStressColumns.sort((a, b) => a.temp - b.temp);
+    
+    saveToLocalStorage();
+    renderReportStressTableEquip();
+};
+
+window.removeEquipmentStressColumn = function(index) {
+    equipmentStressColumns.splice(index, 1);
+    saveToLocalStorage();
+    renderReportStressTableEquip();
+};
+
+function renderReportTableEquip() {
+    const thead = document.getElementById('reportEquipTableHeader');
+    const tbody = document.getElementById('reportEquipTableBody');
+    if (!thead || !tbody) return;
+
+    if (reportMaterialsEquip.length === 0) {
+        thead.innerHTML = '';
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте матеріали до списку обладнання, щоб сформувати таблицю</td></tr>`;
+        return;
+    }
+
+    let headerHtml = `
+        <tr>
+            <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+            <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+    `;
+
+    reportTemperatures.forEach((t, index) => {
+        let optionsHtml = temperatures.map(temp => 
+            `<option value="${temp}" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200" ${temp === t ? 'selected' : ''}>${temp}</option>`
+        ).join('');
+
+        headerHtml += `
+            <th class="py-2.5 px-2 font-semibold text-center min-w-[90px] group border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
+                <div class="relative inline-block w-full">
+                    <select onchange="updateReportTemp(${index}, this.value)" class="text-center w-full bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 focus:border-brand-500 outline-none transition-colors text-slate-700 dark:text-slate-200 cursor-pointer font-semibold appearance-none" style="text-align-last: center;" title="Змінити температуру">
+                        ${optionsHtml}
+                    </select>
+                    <button onclick="removeReportTemp(${index})" class="absolute -right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </th>
+        `;
+    });
+
+    headerHtml += `
+            <th class="py-3 px-2 text-center min-w-[50px] border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
+                <button onclick="addReportTemp()" class="text-brand-500 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 p-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto" title="Додати стовпець температури">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14"></path></svg>
+                </button>
+            </th>
+        </tr>
+    `;
+    thead.innerHTML = headerHtml;
+
+    let html = '';
+    const activeProps = propertiesList.filter(p => equipmentActiveProperties.includes(p.key));
+
+    if (activeProps.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${reportTemperatures.length + 3}" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Оберіть хоча б одну характеристику для відображення</td></tr>`;
+        return;
+    }
+
+    reportMaterialsEquip.forEach((item, index) => {
+        const material = appMaterials[item.matIndex];
+        const grade = material.grades[item.kpIndex];
+        const data = grade.data;
+
+        activeProps.forEach((prop, pIdx) => {
+            const rowClass = pIdx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50/50 dark:bg-slate-800/50';
+            html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
+
+            if (pIdx === 0) {
+                html += `<td rowspan="${activeProps.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                    ${index + 1}. ${item.matName}<br>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                </td>`;
+            }
+
+            html += `<td class="py-2.5 px-4 text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700">
+                    ${prop.name} <span class="text-slate-400 dark:text-slate-500 font-normal ml-1 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
+                </td>`;
+
+            const propData = data[prop.key];
+            reportTemperatures.forEach((t) => {
+                const value = getNearestHigherValue(propData, t);
+                let safeValue = escapeHTML(String(value));
+                if (safeValue !== '—') safeValue = safeValue.replace('.', ',');
+                const displayValue = safeValue === '—' 
+                    ? `<span class="text-slate-300 dark:text-slate-600">—</span>` 
+                    : `<span class="font-semibold text-slate-700 dark:text-slate-200">${safeValue}</span>`;
+
+                html += `<td class="py-2.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50">${displayValue}</td>`;
+            });
+
+            html += `<td class="py-2.5 px-4 border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50"></td>`;
+            html += `</tr>`;
+        });
+    });
+    tbody.innerHTML = html;
+}
+
+function renderReportStressTableEquipHeader() {
+    const thead = document.getElementById('reportEquipStressTableHeader');
+    if (!thead) return;
+
+    if (equipmentStressColumns.length === 0) {
+        thead.innerHTML = `
+            <tr>
+                <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+                <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-center min-w-[120px] max-w-[160px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Найменування елемента</th>
+                <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[220px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+            </tr>
+            <tr></tr>
+        `;
+        return;
+    }
+
+    let row1 = `
+        <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+        <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-center min-w-[120px] max-w-[160px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Найменування елемента</th>
+        <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[220px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+    `;
+    let row2 = '';
+
+    const modeLabels = {
+        gv: "ГВ",
+        nue: "НУЕ, РР",
+        pnue: "ПНУЕ",
+        as: "АС",
+        pz: "ПЗ",
+        mrz: "МРЗ"
+    };
+
+    equipmentStressColumns.forEach((col, idx) => {
+        let bgStyleClass = 'bg-slate-50/80 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400';
+        if (col.mode === 'gv') bgStyleClass = 'bg-emerald-50/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
+        else if (col.mode === 'pz' || col.mode === 'mrz') bgStyleClass = 'bg-amber-50/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
+        else if (col.mode === 'pnue' || col.mode === 'as') bgStyleClass = 'bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
+
+        row1 += `
+            <th class="py-2 px-2 font-bold text-center border-b border-r border-slate-200 dark:border-slate-700 text-[10px] uppercase tracking-wider relative group ${bgStyleClass}">
+                <div class="flex items-center justify-center gap-1 min-w-[80px]">
+                    <span>${modeLabels[col.mode]}</span>
+                    <button onclick="removeEquipmentStressColumn(${idx})" class="opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </th>
+        `;
+
+        row2 += `
+            <th class="py-2 px-2 font-semibold text-center min-w-[90px] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+                ${col.temp} °C
+            </th>
+        `;
+    });
+
+    thead.innerHTML = `
+        <tr>${row1}</tr>
+        <tr>${row2}</tr>
+    `;
+}
+
+function renderReportStressTableEquip() {
+    renderReportStressTableEquipHeader();
+    const tbody = document.getElementById('reportEquipStressTableBody');
+    if (!tbody) return;
+
+    if (reportMaterialsEquip.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${equipmentStressColumns.length + 4}" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте матеріали до списку обладнання, щоб сформувати таблицю</td></tr>`;
+        return;
+    }
+
+    if (equipmentStressColumns.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте стовпець (режим, температура) за допомогою панелі вище</td></tr>`;
+        return;
+    }
+
+    const nm = parseFloat(document.getElementById('calcNm').value) || 2.6;
+    const nt = parseFloat(document.getElementById('calcNt').value) || 1.5;
+    const ntBolt = parseFloat(document.getElementById('calcNtBolt').value) || 2.0;
+    const gm = parseFloat(document.getElementById('calcGm').value) || 1.05;
+    const gc = parseFloat(document.getElementById('calcGc').value) || 1.0;
+    const gnNue = parseFloat(document.getElementById('calcGnNue').value) || 1.25;
+    const gnPz = parseFloat(document.getElementById('calcGnPz').value) || 1.05;
+    
+    const seismicCategory = document.getElementById('reportEquipSeismic')?.value || '1';
+    const isReportDevMode = document.getElementById('reportDevModeToggle')?.checked || false;
+
+    let html = '';
+
+    reportMaterialsEquip.forEach((item, index) => {
+        const material = appMaterials[item.matIndex];
+        const grade = material.grades[item.kpIndex];
+        const data = grade.data;
+
+        let totalRows = 0;
+        let elementGroups = [];
+
+        if (item.elements.includes("Всі деталі (крім шпильок)")) {
+            let props = [
+                { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
+                { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
+                { symbol: "(&sigma;)<sub>RV</sub>", units: "МПа", key: "det_srv" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>1</sub>", units: "МПа", key: "det_ss1" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>2</sub>", units: "МПа", key: "det_ss2" },
+                { symbol: "(&tau;)<sub>s</sub>", units: "МПа", key: "det_ts" }
+            ];
+            elementGroups.push({ elName: "Всі деталі (крім шпильок)", props: props });
+            totalRows += props.length;
+        }
+
+        if (item.elements.includes("Зварювальні та наплавні матеріали")) {
+            let props = [
+                { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
+                { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
+                { symbol: "(&sigma;)<sub>RV</sub>", units: "МПа", key: "det_srv" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>1</sub>", units: "МПа", key: "det_ss1" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>2</sub>", units: "МПа", key: "det_ss2" },
+                { symbol: "(&tau;)<sub>s</sub>", units: "МПа", key: "det_ts" }
+            ];
+            elementGroups.push({ elName: "Зварювальні матеріали", props: props });
+            totalRows += props.length;
+        }
+
+        if (item.elements.includes("Шпильки")) {
+            let props = [
+                { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "bolt_s1" },
+                { symbol: "(&sigma;)<sub>3w</sub>", units: "МПа", key: "bolt_s3w" },
+                { symbol: "(&sigma;)<sub>4w</sub>", units: "МПа", key: "bolt_s4w" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>mw</sub>", units: "МПа", key: "bolt_ssmw" },
+                { symbol: "(&sigma;<sub>s</sub>)<sub>4w</sub>", units: "МПа", key: "bolt_ss4w" },
+                { symbol: "(&tau;<sub>s</sub>)<sub>s</sub>", units: "МПа", key: "bolt_ts" }
+            ];
+            elementGroups.push({ elName: "Шпильки", props: props });
+            totalRows += props.length;
+        }
+
+        if (item.elements.includes("Опора")) {
+            let props = [
+                { symbol: "[R]", units: "МПа", key: "support_R" }
+            ];
+            elementGroups.push({ elName: "Опора", props: props });
+            totalRows += props.length;
+        }
+
+        let isFirstMatRow = true;
+
+        elementGroups.forEach((group) => {
+            group.props.forEach((prop, pIdx) => {
+                const rowClass = pIdx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50/50 dark:bg-slate-800/50';
+                html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
+
+                if (isFirstMatRow) {
+                    html += `<td rowspan="${totalRows}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                        ${index + 1}. ${item.matName}<br>
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                    </td>`;
+                    isFirstMatRow = false;
+                }
+
+                if (pIdx === 0) {
+                    html += `<td rowspan="${group.props.length}" class="bg-indigo-50/30 dark:bg-indigo-900/10 py-2.5 px-4 text-sm font-bold text-indigo-700 dark:text-indigo-400 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 whitespace-normal break-words text-center shadow-inner">
+                        ${group.elName}
+                    </td>`;
+                }
+
+                html += `<td class="py-2.5 px-4 text-sm border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700">
+                    <span class="inline-block text-slate-400 dark:text-slate-500 font-normal bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
+                </td>`;
+
+                equipmentStressColumns.forEach((col) => {
+                    const rtm = getNearestHigherValue(data['RTm'], col.temp);
+                    const rtp = getNearestHigherValue(data['RTp'], col.temp);
+
+                    let val = "—";
+                    let formula = "";
+
+                    const hasRtmAndRtp = (rtm !== "—" && rtp !== "—");
+                    const hasRtp = (rtp !== "—");
+
+                    // 1. ДЕТАЛІ та ЗВАРЮВАЛЬНІ МАТЕРІАЛИ
+                    if (prop.key.startsWith("det_")) {
+                        if (hasRtmAndRtp) {
+                            const sigma = Math.min(rtm / nm, rtp / nt);
+                            
+                            if (prop.key === "det_s1") {
+                                if (col.mode === "gv") { val = roundExcel(sigma * 1.35, 2); formula = `[σ]<sub>ГВ</sub> &times; 1,35`; }
+                                else if (col.mode === "nue") { val = roundExcel(sigma * 1.0, 2); formula = `[σ]`; }
+                                else if (col.mode === "pnue") { val = roundExcel(sigma * 1.2, 2); formula = `[σ] &times; 1,2`; }
+                                else if (col.mode === "as") { val = roundExcel(sigma * 1.4, 2); formula = `[σ] &times; 1,4`; }
+                            } else if (prop.key === "det_s2") {
+                                if (col.mode === "gv") { val = roundExcel(sigma * 1.7, 2); formula = `[σ]<sub>ГВ</sub> &times; 1,7`; }
+                                else if (col.mode === "nue") { val = roundExcel(sigma * 1.3, 2); formula = `[σ] &times; 1,3`; }
+                                else if (col.mode === "pnue") { val = roundExcel(sigma * 1.6, 2); formula = `[σ] &times; 1,6`; }
+                                else if (col.mode === "as") { val = roundExcel(sigma * 1.8, 2); formula = `[σ] &times; 1,8`; }
+                            } else if (prop.key === "det_srv") {
+                                if (col.mode === "nue" || col.mode === "pnue") {
+                                    val = roundExcel(Math.min((2.5 - (rtp / rtm)) * rtp, 2 * rtp), 2);
+                                    formula = `min((2,5-R<sup>T</sup><sub>p0,2</sub>/R<sup>T</sup><sub>m</sub>)R<sup>T</sup><sub>p0,2</sub>, 2R<sup>T</sup><sub>p0,2</sub>)`;
+                                }
+                            } else if (prop.key === "det_ss1") {
+                                if (col.mode === "pz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigma * 1.2, 2); formula = `[σ] &times; 1,2`; }
+                                    else { val = roundExcel(sigma * 1.5, 2); formula = `[σ] &times; 1,5`; }
+                                } else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigma * 1.4, 2); formula = `[σ] &times; 1,4`; }
+                                }
+                            } else if (prop.key === "det_ss2") {
+                                if (col.mode === "pz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigma * 1.6, 2); formula = `[σ] &times; 1,6`; }
+                                    else { val = roundExcel(sigma * 1.9, 2); formula = `[σ] &times; 1,9`; }
+                                } else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigma * 1.8, 2); formula = `[σ] &times; 1,8`; }
+                                }
+                            } else if (prop.key === "det_ts") {
+                                if (col.mode === "pz") { val = roundExcel(sigma * 0.6, 2); formula = `[σ] &times; 0,6`; }
+                                else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigma * 0.7, 2); formula = `[σ] &times; 0,7`; }
+                                }
+                            }
+                        }
+                    } 
+                    // 2. ШПИЛЬКИ (БОЛТИ)
+                    else if (prop.key.startsWith("bolt_")) {
+                        if (hasRtp) {
+                            const sigmaW = rtp / ntBolt;
+
+                            if (prop.key === "bolt_s1") {
+                                if (col.mode === "gv") { val = roundExcel(rtp * 0.7, 2); formula = `R<sup>T</sup><sub>p0,2(ГВ)</sub> &times; 0,7`; }
+                                else if (col.mode === "nue") { val = roundExcel(sigmaW * 1.0, 2); formula = `[σ]<sub>w</sub>`; }
+                                else if (col.mode === "pnue") { val = roundExcel(sigmaW * 1.2, 2); formula = `[σ]<sub>w</sub> &times; 1,2`; }
+                                else if (col.mode === "as") { val = roundExcel(sigmaW * 1.4, 2); formula = `[σ]<sub>w</sub> &times; 1,4`; }
+                            } else if (prop.key === "bolt_s3w") {
+                                if (col.mode === "nue") { val = roundExcel(sigmaW * 1.3, 2); formula = `[σ]<sub>w</sub> &times; 1,3`; }
+                                else if (col.mode === "pnue") { val = roundExcel(sigmaW * 1.6, 2); formula = `[σ]<sub>w</sub> &times; 1,6`; }
+                                else if (col.mode === "as") { val = roundExcel(sigmaW * 1.8, 2); formula = `[σ]<sub>w</sub> &times; 1,8`; }
+                            } else if (prop.key === "bolt_s4w") {
+                                if (col.mode === "nue") { val = roundExcel(sigmaW * 1.7, 2); formula = `[σ]<sub>w</sub> &times; 1,7`; }
+                                else if (col.mode === "pnue") { val = roundExcel(sigmaW * 2.0, 2); formula = `[σ]<sub>w</sub> &times; 2,0`; }
+                                else if (col.mode === "as") { val = roundExcel(sigmaW * 2.4, 2); formula = `[σ]<sub>w</sub> &times; 2,4`; }
+                            } else if (prop.key === "bolt_ssmw") {
+                                if (col.mode === "pz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigmaW * 1.2, 2); formula = `[σ]<sub>w</sub> &times; 1,2`; }
+                                    else { val = roundExcel(sigmaW * 1.5, 2); formula = `[σ]<sub>w</sub> &times; 1,5`; }
+                                } else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigmaW * 1.4, 2); formula = `[σ]<sub>w</sub> &times; 1,4`; }
+                                }
+                            } else if (prop.key === "bolt_ss4w") {
+                                if (col.mode === "pz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigmaW * 2.0, 2); formula = `[σ]<sub>w</sub> &times; 2,0`; }
+                                    else { val = roundExcel(sigmaW * 2.3, 2); formula = `[σ]<sub>w</sub> &times; 2,3`; }
+                                } else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigmaW * 2.2, 2); formula = `[σ]<sub>w</sub> &times; 2,2`; }
+                                }
+                            } else if (prop.key === "bolt_ts") {
+                                if (col.mode === "pz") { val = roundExcel(sigmaW * 0.6, 2); formula = `[σ]<sub>w</sub> &times; 0,6`; }
+                                else if (col.mode === "mrz") {
+                                    if (seismicCategory === '1') { val = roundExcel(sigmaW * 0.7, 2); formula = `[σ]<sub>w</sub> &times; 0,7`; }
+                                }
+                            }
+                        }
+                    } 
+                    // 3. ОПОРА
+                    else if (prop.key === "support_R") {
+                        if (hasRtp) {
+                            const Ry = rtp / gm;
+                            if (col.mode === "gv") {
+                                val = roundExcel((Ry * gc) / gnNue, 2);
+                                formula = `(R<sub>y(ГВ)</sub> &times; &gamma;<sub>c</sub>) / &gamma;<sub>n(НУЕ)</sub>`;
+                            } else if (col.mode === "nue") {
+                                val = roundExcel((Ry * gc) / gnNue, 2);
+                                formula = `(R<sub>y</sub> &times; &gamma;<sub>c</sub>) / &gamma;<sub>n(НУЕ)</sub>`;
+                            } else if (col.mode === "pnue" || col.mode === "pz") {
+                                val = roundExcel((Ry * gc) / gnPz, 2);
+                                formula = `(R<sub>y</sub> &times; &gamma;<sub>c</sub>) / &gamma;<sub>n(ПЗ)</sub>`;
+                            } else if (col.mode === "mrz") {
+                                if (seismicCategory === '1') {
+                                    val = roundExcel((Ry * gc) / gnPz, 2);
+                                    formula = `(R<sub>y</sub> &times; &gamma;<sub>c</sub>) / &gamma;<sub>n(ПЗ)</sub>`;
+                                }
+                            }
+                        }
+                    }
+
+                    let displayValue = "";
+                    if (val === "—") {
+                        displayValue = `<span class="text-slate-300 dark:text-slate-600">—</span>`;
+                    } else {
+                        let valStr = String(val).replace('.', ',');
+                        const isGvOrSeismic = col.mode === 'gv' || col.mode === 'pz' || col.mode === 'mrz';
+                        if (isReportDevMode && formula !== "") {
+                            const wrappedFormula = wrapFormulaVars(formula);
+                            displayValue = `
+                                <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formula}">${wrappedFormula}</div>
+                                <div class="font-bold ${isGvOrSeismic ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'} text-base">${valStr}</div>
+                            `;
+                        } else {
+                            displayValue = `<span class="font-bold ${isGvOrSeismic ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'}">${valStr}</span>`;
+                        }
+                    }
+
+                    const isGvOrSeismic = col.mode === 'gv' || col.mode === 'pz' || col.mode === 'mrz';
+                    const bgClass = isGvOrSeismic ? 'bg-emerald-50/20 dark:bg-emerald-900/10' : '';
+
+                    html += `<td class="${bgClass} py-2.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50">${displayValue}</td>`;
+                });
+
+                html += `<td class="py-2.5 px-4 border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50"></td>`;
+                html += `</tr>`;
+            });
+        });
+    });
+    tbody.innerHTML = html;
+}
 
 document.addEventListener('DOMContentLoaded', init);
