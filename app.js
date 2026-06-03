@@ -2671,6 +2671,8 @@ function renderReportTableEquip() {
     const tbody = document.getElementById('reportEquipTableBody');
     if (!thead || !tbody) return;
 
+    renderReportStressTableEquip();
+
     if (reportMaterialsEquip.length === 0) {
         thead.innerHTML = '';
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте матеріали до списку обладнання, щоб сформувати таблицю</td></tr>`;
