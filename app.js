@@ -2769,7 +2769,6 @@ function renderReportStressTableEquipHeader() {
         thead.innerHTML = `
             <tr>
                 <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
-                <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-center min-w-[120px] max-w-[160px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Найменування елемента</th>
                 <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[220px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
             </tr>
             <tr></tr>
@@ -2779,7 +2778,6 @@ function renderReportStressTableEquipHeader() {
 
     let row1 = `
         <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
-        <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-center min-w-[120px] max-w-[160px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Найменування елемента</th>
         <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[220px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
     `;
     let row2 = '';
@@ -2829,12 +2827,12 @@ function renderReportStressTableEquip() {
     if (!tbody) return;
 
     if (reportMaterialsEquip.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${equipmentStressColumns.length + 4}" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте матеріали до списку обладнання, щоб сформувати таблицю</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${equipmentStressColumns.length + 3}" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте матеріали до списку обладнання, щоб сформувати таблицю</td></tr>`;
         return;
     }
 
     if (equipmentStressColumns.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте стовпець (режим, температура) за допомогою панелі вище</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-10 text-slate-500 dark:text-slate-400 font-medium">Додайте стовпець (режим, температура) за допомогою панелі вище</td></tr>`;
         return;
     }
 
@@ -2851,83 +2849,79 @@ function renderReportStressTableEquip() {
 
     let html = '';
 
-    reportMaterialsEquip.forEach((item, index) => {
-        const material = appMaterials[item.matIndex];
-        const grade = material.grades[item.kpIndex];
-        const data = grade.data;
-
-        let totalRows = 0;
-        let elementGroups = [];
-
-        const itemElements = (item.elements && Array.isArray(item.elements) && item.elements.length > 0)
-            ? item.elements
-            : ["Всі деталі (крім шпильок)", "Зварювальні та наплавні матеріали", "Шпильки", "Опора"];
-
-        if (itemElements.includes("Всі деталі (крім шпильок)")) {
-            let props = [
+    const equipElementsConfig = [
+        {
+            name: "Всі деталі (крім шпильок)",
+            props: [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
                 { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
                 { symbol: "(&sigma;)<sub>RV</sub>", units: "МПа", key: "det_srv" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>1</sub>", units: "МПа", key: "det_ss1" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>2</sub>", units: "МПа", key: "det_ss2" },
                 { symbol: "(&tau;)<sub>s</sub>", units: "МПа", key: "det_ts" }
-            ];
-            elementGroups.push({ elName: "Всі деталі (крім шпильок)", props: props });
-            totalRows += props.length;
-        }
-
-        if (itemElements.includes("Зварювальні та наплавні матеріали")) {
-            let props = [
+            ]
+        },
+        {
+            name: "Зварювальні та наплавні матеріали",
+            props: [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
                 { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
                 { symbol: "(&sigma;)<sub>RV</sub>", units: "МПа", key: "det_srv" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>1</sub>", units: "МПа", key: "det_ss1" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>2</sub>", units: "МПа", key: "det_ss2" },
                 { symbol: "(&tau;)<sub>s</sub>", units: "МПа", key: "det_ts" }
-            ];
-            elementGroups.push({ elName: "Зварювальні матеріали", props: props });
-            totalRows += props.length;
-        }
-
-        if (itemElements.includes("Шпильки")) {
-            let props = [
+            ]
+        },
+        {
+            name: "Шпильки",
+            props: [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "bolt_s1" },
                 { symbol: "(&sigma;)<sub>3w</sub>", units: "МПа", key: "bolt_s3w" },
                 { symbol: "(&sigma;)<sub>4w</sub>", units: "МПа", key: "bolt_s4w" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>mw</sub>", units: "МПа", key: "bolt_ssmw" },
                 { symbol: "(&sigma;<sub>s</sub>)<sub>4w</sub>", units: "МПа", key: "bolt_ss4w" },
                 { symbol: "(&tau;<sub>s</sub>)<sub>s</sub>", units: "МПа", key: "bolt_ts" }
-            ];
-            elementGroups.push({ elName: "Шпильки", props: props });
-            totalRows += props.length;
-        }
-
-        if (itemElements.includes("Опора")) {
-            let props = [
+            ]
+        },
+        {
+            name: "Опора",
+            props: [
                 { symbol: "[R]", units: "МПа", key: "support_R" }
-            ];
-            elementGroups.push({ elName: "Опора", props: props });
-            totalRows += props.length;
+            ]
         }
+    ];
 
-        let isFirstMatRow = true;
+    equipElementsConfig.forEach((el) => {
+        const matchingMaterials = reportMaterialsEquip.filter(item => {
+            const itemElements = (item.elements && Array.isArray(item.elements) && item.elements.length > 0)
+                ? item.elements
+                : ["Всі деталі (крім шпильок)", "Зварювальні та наплавні матеріали", "Шпильки", "Опора"];
+            return itemElements.includes(el.name);
+        });
 
-        elementGroups.forEach((group) => {
-            group.props.forEach((prop, pIdx) => {
+        if (matchingMaterials.length === 0) return;
+
+        html += `
+            <tr class="bg-indigo-50/50 dark:bg-indigo-950/20 font-bold text-indigo-700 dark:text-indigo-400">
+                <td colspan="${equipmentStressColumns.length + 3}" class="py-2.5 px-4 text-left border-b border-slate-200 dark:border-slate-700 text-sm font-bold uppercase tracking-wider">
+                    ${el.name}
+                </td>
+            </tr>
+        `;
+
+        matchingMaterials.forEach((item, matIdx) => {
+            const material = appMaterials[item.matIndex];
+            const grade = material.grades[item.kpIndex];
+            const data = grade.data;
+
+            el.props.forEach((prop, pIdx) => {
                 const rowClass = pIdx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50/50 dark:bg-slate-800/50';
                 html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
 
-                if (isFirstMatRow) {
-                    html += `<td rowspan="${totalRows}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
-                        ${index + 1}. ${item.matName}<br>
-                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
-                    </td>`;
-                    isFirstMatRow = false;
-                }
-
                 if (pIdx === 0) {
-                    html += `<td rowspan="${group.props.length}" class="bg-indigo-50/30 dark:bg-indigo-900/10 py-2.5 px-4 text-sm font-bold text-indigo-700 dark:text-indigo-400 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 whitespace-normal break-words text-center shadow-inner">
-                        ${group.elName}
+                    html += `<td rowspan="${el.props.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                        ${matIdx + 1}. ${item.matName}<br>
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
                     </td>`;
                 }
 
@@ -2945,7 +2939,6 @@ function renderReportStressTableEquip() {
                     const hasRtmAndRtp = (rtm !== "—" && rtp !== "—");
                     const hasRtp = (rtp !== "—");
 
-                    // 1. ДЕТАЛІ та ЗВАРЮВАЛЬНІ МАТЕРІАЛИ
                     if (prop.key.startsWith("det_")) {
                         if (hasRtmAndRtp) {
                             const sigma = Math.min(rtm / nm, rtp / nt);
@@ -2987,7 +2980,6 @@ function renderReportStressTableEquip() {
                             }
                         }
                     } 
-                    // 2. ШПИЛЬКИ (БОЛТИ)
                     else if (prop.key.startsWith("bolt_")) {
                         if (hasRtp) {
                             const sigmaW = rtp / ntBolt;
@@ -3027,7 +3019,6 @@ function renderReportStressTableEquip() {
                             }
                         }
                     } 
-                    // 3. ОПОРА
                     else if (prop.key === "support_R") {
                         if (hasRtp) {
                             const Ry = rtp / gm;
