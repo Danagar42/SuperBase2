@@ -384,60 +384,67 @@
                                 <table class="w-full text-sm text-center border-separate border-spacing-0">
                                     <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
                                         <tr>
-                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[14%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">АС</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>1</sub></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_gv"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_nue"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_pnue"></td>
-                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_gv"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s1_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s1_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s1_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>2</sub></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_gv"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_nue"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_pnue"></td>
-                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_gv"></td>
+                                            <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_s2_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s2_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_s2_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>RV</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_gv"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_srv_nue"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_srv_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_srv_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>1</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss1_as"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss1_pz"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss1_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>2</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ss2_as"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss2_pz"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ss2_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&tau;)<sub>s</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="det_ts_as"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ts_pz"></td>
                                             <td class="p-3 font-bold text-blue-600 dark:text-blue-400 text-base" id="det_ts_mrz"></td>
                                         </tr>
@@ -456,60 +463,67 @@
                                 <table class="w-full text-sm text-center border-separate border-spacing-0">
                                     <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
                                         <tr>
-                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[14%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">АС</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>1</sub></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_gv"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_nue"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_pnue"></td>
-                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s1_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s1_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s1_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>3w</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_gv"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s3w_nue"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s3w_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s3w_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s3w_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;)<sub>4w</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_gv"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s4w_nue"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s4w_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_gv"></td>
+                                            <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_s4w_as"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_pz"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_s4w_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>mw</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ssmw_as"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ssmw_pz"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ssmw_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&sigma;<sub>s</sub>)<sub>4w</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ss4w_as"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ss4w_pz"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ss4w_mrz"></td>
                                         </tr>
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">(&tau;<sub>s</sub>)<sub>s</sub></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_gv"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_nue"></td>
                                             <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="bolt_ts_as"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ts_pz"></td>
                                             <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400 text-base" id="bolt_ts_mrz"></td>
                                         </tr>
@@ -528,20 +542,22 @@
                                 <table class="w-full text-sm text-center border-separate border-spacing-0">
                                     <thead class="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs uppercase">
                                         <tr>
-                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[16%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
-                                            <th class="p-3 font-semibold w-[16%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
+                                            <th class="sticky-col-header first-col p-3 font-semibold min-w-[140px] w-[14%] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Параметр</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ГВ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">НУЕ, РР</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">ПНУЕ</th>
+                                            <th class="p-3 font-semibold w-[14%] border-b border-slate-200 dark:border-slate-700">АС</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+ПЗ<br>ПНУЕ+ПЗ</th>
+                                            <th class="p-3 font-semibold w-[15%] border-b border-slate-200 dark:border-slate-700 leading-tight">НУЕ+МРЗ<br>ПНУЕ+МРЗ</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                         <tr class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <td class="sticky-col bg-inherit p-3 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">[R]</td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_gv"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_nue"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pnue"></td>
-                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_gv"></td>
+                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="op_R_as"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pz"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_mrz"></td>
                                         </tr>

@@ -1,14 +1,16 @@
 const PNAE_COEFS = {
     s1_pnue: 1.2,
     s2_nue: 1.3, s2_pnue: 1.6,
+    s1_as: 1.4, s2_as: 1.8,
     ss1_pz_cat1: 1.2, ss1_mrz_cat1: 1.4,
     ss2_pz_cat1: 1.6, ss2_mrz_cat1: 1.8,
     ss1_pz_cat2: 1.5, ss2_pz_cat2: 1.9,
     ts_pz: 0.6, ts_mrz: 0.7,
     gv_s1: 1.35, gv_s2: 1.7,
     bolt_pnue: 1.2,
-    bolt_s3w_nue: 1.3, bolt_s3w_pnue: 1.6,
-    bolt_s4w_nue: 1.7, bolt_s4w_pnue: 2.0,
+    bolt_s1_as: 1.4,
+    bolt_s3w_nue: 1.3, bolt_s3w_pnue: 1.6, bolt_s3w_as: 1.8,
+    bolt_s4w_nue: 1.7, bolt_s4w_pnue: 2.0, bolt_s4w_as: 2.4,
     bolt_ssmw_pz_cat1: 1.2, bolt_ssmw_mrz_cat1: 1.4,
     bolt_ss4w_pz_cat1: 2.0, bolt_ss4w_mrz_cat1: 2.2,
     bolt_ssmw_pz_cat2: 1.5,
@@ -19,6 +21,7 @@ const PNAE_COEFS = {
     thread_nue: 0.32,
     bolt_tau_sw: 0.5
 };
+
 
 const temperatures = [20, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
 
@@ -1592,14 +1595,18 @@ function updateCalculator() {
     if (sigma !== null) {
         renderCell('det_s1_nue', sigma * 1.0, `[σ] &times; 1.0`);
         renderCell('det_s1_pnue', sigma * PNAE_COEFS.s1_pnue, `[σ] &times; ${PNAE_COEFS.s1_pnue}`);
+        renderCell('det_s1_as', sigma * PNAE_COEFS.s1_as, `[σ] &times; ${PNAE_COEFS.s1_as}`);
         renderCell('det_s1_pz', null, ""); renderCell('det_s1_mrz', null, "");
 
         renderCell('det_s2_nue', sigma * PNAE_COEFS.s2_nue, `[σ] &times; ${PNAE_COEFS.s2_nue}`);
         renderCell('det_s2_pnue', sigma * PNAE_COEFS.s2_pnue, `[σ] &times; ${PNAE_COEFS.s2_pnue}`);
+        renderCell('det_s2_as', sigma * PNAE_COEFS.s2_as, `[σ] &times; ${PNAE_COEFS.s2_as}`);
         renderCell('det_s2_pz', null, ""); renderCell('det_s2_mrz', null, "");
 
         renderCell('det_ss1_nue', null, ""); renderCell('det_ss1_pnue', null, "");
+        renderCell('det_ss1_as', null, "");
         renderCell('det_ss2_nue', null, ""); renderCell('det_ss2_pnue', null, "");
+        renderCell('det_ss2_as', null, "");
 
         if (seismicCategory === '1') {
             renderCell('det_ss1_pz', sigma * PNAE_COEFS.ss1_pz_cat1, `[σ] &times; ${PNAE_COEFS.ss1_pz_cat1}`);
@@ -1617,13 +1624,15 @@ function updateCalculator() {
         let rvFormulaStr = `min((2.5 - R<sup>T</sup><sub>p0,2</sub>/R<sup>T</sup><sub>m</sub>)&times;R<sup>T</sup><sub>p0,2</sub>, 2&times;R<sup>T</sup><sub>p0,2</sub>)`;
         renderCell('det_srv_nue', sigmaRv, rvFormulaStr);
         renderCell('det_srv_pnue', sigmaRv, rvFormulaStr);
+        renderCell('det_srv_as', null, "");
         renderCell('det_srv_pz', null, ""); renderCell('det_srv_mrz', null, "");
 
         renderCell('det_ts_nue', null, ""); renderCell('det_ts_pnue', null, "");
+        renderCell('det_ts_as', null, "");
         renderCell('det_ts_pz', sigma * PNAE_COEFS.ts_pz, `[σ] &times; ${PNAE_COEFS.ts_pz}`);
         renderCell('det_ts_mrz', sigma * PNAE_COEFS.ts_mrz, `[σ] &times; ${PNAE_COEFS.ts_mrz}`);
     } else {
-        ['nue', 'pnue', 'pz', 'mrz'].forEach(col => {
+        ['nue', 'pnue', 'as', 'pz', 'mrz'].forEach(col => {
             renderCell(`det_s1_${col}`, null, ""); renderCell(`det_s2_${col}`, null, ""); renderCell(`det_srv_${col}`, null, "");
             renderCell(`det_ss1_${col}`, null, ""); renderCell(`det_ss2_${col}`, null, ""); renderCell(`det_ts_${col}`, null, "");
         });
@@ -1644,18 +1653,23 @@ function updateCalculator() {
     if (sigmaW !== null && stepRtp !== null) {
         renderCell('bolt_s1_nue', sigmaW * 1.0, `[σ]<sub>w</sub>`);
         renderCell('bolt_s1_pnue', sigmaW * PNAE_COEFS.bolt_pnue, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_pnue}`);
+        renderCell('bolt_s1_as', sigmaW * PNAE_COEFS.bolt_s1_as, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s1_as}`);
         renderCell('bolt_s1_pz', null, ""); renderCell('bolt_s1_mrz', null, "");
 
         renderCell('bolt_s3w_nue', sigmaW * PNAE_COEFS.bolt_s3w_nue, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s3w_nue}`);
         renderCell('bolt_s3w_pnue', sigmaW * PNAE_COEFS.bolt_s3w_pnue, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s3w_pnue}`);
+        renderCell('bolt_s3w_as', sigmaW * PNAE_COEFS.bolt_s3w_as, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s3w_as}`);
         renderCell('bolt_s3w_pz', null, ""); renderCell('bolt_s3w_mrz', null, "");
 
         renderCell('bolt_s4w_nue', sigmaW * PNAE_COEFS.bolt_s4w_nue, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s4w_nue}`);
         renderCell('bolt_s4w_pnue', sigmaW * PNAE_COEFS.bolt_s4w_pnue, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s4w_pnue}`);
+        renderCell('bolt_s4w_as', sigmaW * PNAE_COEFS.bolt_s4w_as, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_s4w_as}`);
         renderCell('bolt_s4w_pz', null, ""); renderCell('bolt_s4w_mrz', null, "");
 
         renderCell('bolt_ssmw_nue', null, ""); renderCell('bolt_ssmw_pnue', null, ""); 
+        renderCell('bolt_ssmw_as', null, "");
         renderCell('bolt_ss4w_nue', null, ""); renderCell('bolt_ss4w_pnue', null, ""); 
+        renderCell('bolt_ss4w_as', null, "");
 
         if (seismicCategory === '1') {
             renderCell('bolt_ssmw_pz', sigmaW * PNAE_COEFS.bolt_ssmw_pz_cat1, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ssmw_pz_cat1}`);
@@ -1670,10 +1684,11 @@ function updateCalculator() {
         }
 
         renderCell('bolt_ts_nue', null, ""); renderCell('bolt_ts_pnue', null, ""); 
+        renderCell('bolt_ts_as', null, "");
         renderCell('bolt_ts_pz', sigmaW * PNAE_COEFS.bolt_ts_pz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ts_pz}`);
         renderCell('bolt_ts_mrz', sigmaW * PNAE_COEFS.bolt_ts_mrz, `[σ]<sub>w</sub> &times; ${PNAE_COEFS.bolt_ts_mrz}`);
     } else {
-        ['nue', 'pnue', 'pz', 'mrz'].forEach(col => {
+        ['nue', 'pnue', 'as', 'pz', 'mrz'].forEach(col => {
             renderCell(`bolt_s1_${col}`, null, ""); renderCell(`bolt_s3w_${col}`, null, ""); renderCell(`bolt_s4w_${col}`, null, "");
             renderCell(`bolt_ssmw_${col}`, null, ""); renderCell(`bolt_ss4w_${col}`, null, ""); renderCell(`bolt_ts_${col}`, null, "");
         });
@@ -1700,10 +1715,12 @@ function updateCalculator() {
 
         renderCell('op_R_nue', rNue, fNue);
         renderCell('op_R_pnue', rPz, fPz);
+        renderCell('op_R_as', null, "");
         renderCell('op_R_pz', rPz, fPz);
         renderCell('op_R_mrz', rPz, fPz);
     } else {
         renderCell('op_R_nue', null, ""); renderCell('op_R_pnue', null, ""); 
+        renderCell('op_R_as', null, "");
         renderCell('op_R_pz', null, ""); renderCell('op_R_mrz', null, "");
     }
 
