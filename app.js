@@ -219,7 +219,14 @@ function loadFromLocalStorage() {
     }
     const savedReports = localStorage.getItem('pnae_report_materials');
     if(savedReports) {
-        try { reportMaterials = JSON.parse(savedReports); } catch(e){}
+        try { 
+            reportMaterials = JSON.parse(savedReports); 
+            reportMaterials.forEach(item => {
+                if (!item.elements || !Array.isArray(item.elements) || item.elements.length === 0) {
+                    item.elements = ["Фланець", "Шпильки", "Різьба"];
+                }
+            });
+        } catch(e){}
     }
     
     const savedSubtab = localStorage.getItem('pnae_active_report_subtab');
@@ -227,7 +234,14 @@ function loadFromLocalStorage() {
     
     const savedReportsEquip = localStorage.getItem('pnae_report_materials_equip');
     if(savedReportsEquip) {
-        try { reportMaterialsEquip = JSON.parse(savedReportsEquip); } catch(e){}
+        try { 
+            reportMaterialsEquip = JSON.parse(savedReportsEquip); 
+            reportMaterialsEquip.forEach(item => {
+                if (!item.elements || !Array.isArray(item.elements) || item.elements.length === 0) {
+                    item.elements = ["Всі деталі (крім шпильок)", "Зварювальні та наплавні матеріали", "Шпильки", "Опора"];
+                }
+            });
+        } catch(e){}
     }
     
     const savedEquipProps = localStorage.getItem('pnae_equipment_active_properties');
@@ -657,7 +671,7 @@ function renderReportList() {
                 <div class="truncate">
                     <div class="font-bold text-slate-800 dark:text-slate-200 text-xs truncate" title="${item.matName}">${item.matName}</div>
                     <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">${item.kpName}</div>
-                    <div class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 truncate mt-0.5">${item.elements.join(', ')}</div>
+                    <div class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 truncate mt-0.5">${(item.elements || []).join(', ')}</div>
                 </div>
             </div>
             <button onclick="removeReportItem(${index})" title="Видалити" class="pointer-events-auto text-slate-400 hover:text-rose-500 p-1.5 shrink-0 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/20 z-10 relative">
@@ -949,7 +963,11 @@ function renderReportStressTable() {
         let totalRows = 0;
         let elementGroups = [];
 
-        if (item.elements.includes("Фланець")) {
+        const itemElements = (item.elements && Array.isArray(item.elements) && item.elements.length > 0)
+            ? item.elements
+            : ["Фланець", "Шпильки", "Різьба"];
+
+        if (itemElements.includes("Фланець")) {
             let props = [
                 { name: "Допуст. напруження", symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "flange_s2" },
                 { name: "Допуст. напруження", symbol: "(&sigma;)<sub>RV</sub>", units: "МПа", key: "flange_srv" }
@@ -2839,7 +2857,11 @@ function renderReportStressTableEquip() {
         let totalRows = 0;
         let elementGroups = [];
 
-        if (item.elements.includes("Всі деталі (крім шпильок)")) {
+        const itemElements = (item.elements && Array.isArray(item.elements) && item.elements.length > 0)
+            ? item.elements
+            : ["Всі деталі (крім шпильок)", "Зварювальні та наплавні матеріали", "Шпильки", "Опора"];
+
+        if (itemElements.includes("Всі деталі (крім шпильок)")) {
             let props = [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
                 { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
@@ -2852,7 +2874,7 @@ function renderReportStressTableEquip() {
             totalRows += props.length;
         }
 
-        if (item.elements.includes("Зварювальні та наплавні матеріали")) {
+        if (itemElements.includes("Зварювальні та наплавні матеріали")) {
             let props = [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "det_s1" },
                 { symbol: "(&sigma;)<sub>2</sub>", units: "МПа", key: "det_s2" },
@@ -2865,7 +2887,7 @@ function renderReportStressTableEquip() {
             totalRows += props.length;
         }
 
-        if (item.elements.includes("Шпильки")) {
+        if (itemElements.includes("Шпильки")) {
             let props = [
                 { symbol: "(&sigma;)<sub>1</sub>", units: "МПа", key: "bolt_s1" },
                 { symbol: "(&sigma;)<sub>3w</sub>", units: "МПа", key: "bolt_s3w" },
@@ -2878,7 +2900,7 @@ function renderReportStressTableEquip() {
             totalRows += props.length;
         }
 
-        if (item.elements.includes("Опора")) {
+        if (itemElements.includes("Опора")) {
             let props = [
                 { symbol: "[R]", units: "МПа", key: "support_R" }
             ];
