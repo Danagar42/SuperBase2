@@ -778,12 +778,12 @@ function renderReportHeader() {
     const thead2 = document.getElementById('reportStressTableHeader');
     
     let htmlBase1 = `
-        <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom">Матеріал</th>
+        <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 align-bottom">Матеріал</th>
         <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom">Характеристика \\ Т, °С</th>
     `;
 
     let htmlBase2 = `
-        <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom">Матеріал</th>
+        <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom">Матеріал</th>
         <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-center min-w-[120px] max-w-[160px] border-r border-slate-200 dark:border-slate-700 align-bottom">Найменування елемента</th>
         <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[120px] border-r border-slate-200 dark:border-slate-700 align-bottom">Характеристика \\ Т, °С</th>
     `;
@@ -908,7 +908,7 @@ function renderReportTable() {
             html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
             
             if (pIdx === 0) {
-                html += `<td rowspan="2" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                html += `<td rowspan="2" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                     ${index + 1}. ${item.matName}<br>
                     <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
                 </td>`;
@@ -1001,7 +1001,7 @@ function renderReportStressTable() {
                 html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
                 
                 if (isFirstMatRow) {
-                    html += `<td rowspan="${totalRows}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                    html += `<td rowspan="${totalRows}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                         ${index + 1}. ${item.matName}<br>
                         <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
                     </td>`;
@@ -2699,7 +2699,7 @@ function renderReportTableEquip() {
 
     let headerHtml = `
         <tr>
-            <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+            <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
             <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[250px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
     `;
 
@@ -2750,7 +2750,7 @@ function renderReportTableEquip() {
             html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
 
             if (pIdx === 0) {
-                html += `<td rowspan="${activeProps.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                html += `<td rowspan="${activeProps.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                     ${index + 1}. ${item.matName}<br>
                     <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
                 </td>`;
@@ -2795,7 +2795,7 @@ function renderReportStressTableEquipHeader() {
     if (equipmentStressColumns.length === 0) {
         thead.innerHTML = `
             <tr>
-                <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+                <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
                 <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[120px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
                 <th rowspan="2" class="py-3 px-2 text-center min-w-[50px] border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
                     <button onclick="addEquipmentStressColumn()" class="text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 p-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto" title="Додати стовпець">
@@ -2809,7 +2809,7 @@ function renderReportStressTableEquipHeader() {
     }
 
     let row1 = `
-        <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
+        <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
         <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[120px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
     `;
     let row2 = '';
@@ -2964,7 +2964,7 @@ function renderReportStressTableEquip() {
                 html += `<tr class="hover:bg-brand-50/50 dark:hover:bg-slate-700/50 transition-colors ${rowClass}">`;
 
                 if (pIdx === 0) {
-                    html += `<td rowspan="${el.props.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
+                    html += `<td rowspan="${el.props.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                         ${matIdx + 1}. ${item.matName}<br>
                         <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
                     </td>`;
