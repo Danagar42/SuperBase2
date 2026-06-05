@@ -2590,6 +2590,7 @@ window.switchReportSubTab = function(tab) {
     const contentEquip = document.getElementById('report-content-equipment');
     const actionsGaskets = document.getElementById('reportActionsGaskets');
     const actionsEquipment = document.getElementById('reportActionsEquipment');
+    const equipControls = document.getElementById('reportEquipControls');
 
     if (tab === 'gaskets') {
         btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
@@ -2598,6 +2599,10 @@ window.switchReportSubTab = function(tab) {
         contentEquip.classList.add('hidden');
         actionsGaskets.classList.remove('hidden');
         actionsEquipment.classList.add('hidden');
+        if (equipControls) {
+            equipControls.classList.add('hidden');
+            equipControls.classList.remove('flex');
+        }
     } else {
         btnEquip.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
         btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
@@ -2605,6 +2610,10 @@ window.switchReportSubTab = function(tab) {
         contentEquip.classList.remove('hidden');
         actionsGaskets.classList.add('hidden');
         actionsEquipment.classList.remove('hidden');
+        if (equipControls) {
+            equipControls.classList.remove('hidden');
+            equipControls.classList.add('flex');
+        }
     }
 
     saveToLocalStorage();
