@@ -2779,8 +2779,8 @@ function renderReportStressTableEquipHeader() {
         { value: "nue", label: "НУЕ, РР" },
         { value: "pnue", label: "ПНУЕ" },
         { value: "as", label: "АС" },
-        { value: "pz", label: "ПЗ" },
-        { value: "mrz", label: "МРЗ" }
+        { value: "pz", label: "НУЕ+ПЗ, ПНУЕ+ПЗ" },
+        { value: "mrz", label: "НУЕ+МРЗ, ПНУЕ+МРЗ" }
     ];
 
     if (equipmentStressColumns.length === 0) {
