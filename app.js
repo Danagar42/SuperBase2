@@ -411,7 +411,7 @@ function init() {
         const material = appMaterials[matIndex];
         const grade = material.grades[kpIndex];
         const matName = material.name;
-        const kpName = grade.kp ? `КП ${grade.kp}` : 'Без КП';
+        const kpName = grade.kp ? `Категорія міцності ${grade.kp}` : 'Без категорії міцності';
 
         if (activeReportSubTab === 'gaskets') {
             const selectedElements = Array.from(document.querySelectorAll('.report-element-cb:checked')).map(cb => cb.value);
@@ -1237,7 +1237,7 @@ function updateKpList() {
         const option = document.createElement('option');
         option.value = index;
         
-        let label = grade.kp ? `КП ${grade.kp}` : "Без КП";
+        let label = grade.kp ? `Категорія міцності ${grade.kp}` : "Без категорії міцності";
         const cleanDesc = formatDescription(appMaterials[matIndex].name, grade.description);
         if (cleanDesc !== 'Не вказано') {
             let preview = cleanDesc.length > 50 ? cleanDesc.substring(0, 50) + '...' : cleanDesc;
