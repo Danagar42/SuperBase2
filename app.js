@@ -779,7 +779,7 @@ function renderReportHeader() {
     
     let htmlBase1 = `
         <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 align-bottom">Матеріал</th>
-        <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[300px] min-w-[300px] max-w-[300px] border-r border-slate-200 dark:border-slate-700 align-bottom">Характеристика \\ Т, °С</th>
+        <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[350px] min-w-[350px] max-w-[350px] border-r border-slate-200 dark:border-slate-700 align-bottom">Характеристика \\ Т, °С</th>
     `;
 
     let htmlBase2 = `
@@ -914,7 +914,7 @@ function renderReportTable() {
                 </td>`;
             }
 
-            html += `<td class="py-2.5 px-4 text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[300px] min-w-[300px] max-w-[300px]">
+            html += `<td class="py-2.5 px-4 text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[350px] min-w-[350px] max-w-[350px]">
                     ${prop.name} <span class="text-slate-400 dark:text-slate-500 font-normal ml-1 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
                 </td>`;
 
@@ -2700,7 +2700,7 @@ function renderReportTableEquip() {
     let headerHtml = `
         <tr>
             <th class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
-            <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[300px] min-w-[300px] max-w-[300px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+            <th class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[350px] min-w-[350px] max-w-[350px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
     `;
 
     reportTemperatures.forEach((t, index) => {
@@ -2756,7 +2756,7 @@ function renderReportTableEquip() {
                 </td>`;
             }
 
-            html += `<td class="py-2.5 px-4 text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[300px] min-w-[300px] max-w-[300px]">
+            html += `<td class="py-2.5 px-4 text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[350px] min-w-[350px] max-w-[350px]">
                     ${prop.name} <span class="text-slate-400 dark:text-slate-500 font-normal ml-1 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
                 </td>`;
 
@@ -2796,7 +2796,7 @@ function renderReportStressTableEquipHeader() {
         thead.innerHTML = `
             <tr>
                 <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
-                <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[300px] min-w-[300px] max-w-[300px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+                <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[350px] min-w-[350px] max-w-[350px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
                 <th rowspan="2" class="py-3 px-2 text-center min-w-[50px] border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
                     <button onclick="addEquipmentStressColumn()" class="text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 p-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto" title="Додати стовпець">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14"></path></svg>
@@ -2810,7 +2810,7 @@ function renderReportStressTableEquipHeader() {
 
     let row1 = `
         <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left w-[240px] min-w-[240px] max-w-[240px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
-        <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[300px] min-w-[300px] max-w-[300px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+        <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left w-[350px] min-w-[350px] max-w-[350px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
     `;
     let row2 = '';
 
@@ -2970,7 +2970,7 @@ function renderReportStressTableEquip() {
                     </td>`;
                 }
 
-                html += `<td class="py-2.5 px-4 text-sm border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[300px] min-w-[300px] max-w-[300px]">
+                html += `<td class="py-2.5 px-4 text-sm border-b border-slate-100 dark:border-slate-700 border-r border-slate-200 dark:border-slate-700 w-[350px] min-w-[350px] max-w-[350px]">
                     <span class="inline-block text-slate-400 dark:text-slate-500 font-normal bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 whitespace-nowrap">${prop.symbol}, ${prop.units}</span>
                 </td>`;
 
