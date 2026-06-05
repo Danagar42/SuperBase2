@@ -2903,7 +2903,7 @@ function renderReportStressTableEquip() {
 
         html += `
             <tr class="bg-indigo-50/50 dark:bg-indigo-950/20 font-bold text-indigo-700 dark:text-indigo-400">
-                <td colspan="${equipmentStressColumns.length + 3}" class="py-2.5 px-4 text-left border-b border-slate-200 dark:border-slate-700 text-sm font-bold uppercase tracking-wider">
+                <td colspan="${equipmentStressColumns.length + 3}" class="py-2.5 px-4 text-center border-b border-slate-200 dark:border-slate-700 text-sm font-bold uppercase tracking-wider">
                     ${el.name}
                 </td>
             </tr>
