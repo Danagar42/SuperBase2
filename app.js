@@ -836,9 +836,9 @@ function renderReportHeader() {
         `;
 
         tempsHtml2 += `
-            <th class="py-2.5 px-2 font-semibold text-center min-w-[90px] group border-b ${isGv ? 'border-r border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/20 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700'} align-middle">
+            <th class="py-2.5 px-2 font-semibold text-center min-w-[90px] group border-b border-slate-200 dark:border-slate-700 align-middle">
                 <div class="relative inline-block w-full">
-                    <select onchange="updateReportTemp(${index}, this.value)" class="text-center w-full bg-transparent border-b border-dashed ${isGv ? 'border-emerald-400 dark:border-emerald-600 hover:border-emerald-600 text-emerald-700 dark:text-emerald-400' : 'border-slate-300 dark:border-slate-600 hover:border-brand-500 text-slate-700 dark:text-slate-200'} outline-none transition-colors cursor-pointer font-semibold appearance-none" style="text-align-last: center;" title="Змінити температуру">
+                    <select onchange="updateReportTemp(${index}, this.value)" class="text-center w-full bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 text-slate-700 dark:text-slate-200 outline-none transition-colors cursor-pointer font-semibold appearance-none" style="text-align-last: center;" title="Змінити температуру">
                         ${optionsHtml}
                     </select>
                     <button onclick="removeReportTemp(${index})" class="absolute -right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
@@ -1079,14 +1079,14 @@ function renderReportStressTable() {
                             const wrappedFormula = wrapFormulaVars(formula);
                             displayValue = `
                                 <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formula}">${wrappedFormula}</div>
-                                <div class="font-bold ${isGv ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'} text-base">${valStr}</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200 text-base">${valStr}</div>
                             `;
                         } else {
-                            displayValue = `<span class="font-bold ${isGv ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'}">${valStr}</span>`;
+                            displayValue = `<span class="font-bold text-slate-800 dark:text-slate-200">${valStr}</span>`;
                         }
                     }
                         
-                    const bgClass = isGv ? 'bg-emerald-50/20 dark:bg-emerald-900/10' : '';
+                    const bgClass = '';
                     
                     html += `<td class="${bgClass} py-2.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50">${displayValue}</td>`;
                 });
@@ -3092,15 +3092,14 @@ function renderReportStressTableEquip() {
                             const wrappedFormula = wrapFormulaVars(formula);
                             displayValue = `
                                 <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium" title="${formula}">${wrappedFormula}</div>
-                                <div class="font-bold ${isGvOrSeismic ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'} text-base">${valStr}</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200 text-base">${valStr}</div>
                             `;
                         } else {
-                            displayValue = `<span class="font-bold ${isGvOrSeismic ? 'text-emerald-600 dark:text-emerald-400' : 'text-teal-600 dark:text-teal-400'}">${valStr}</span>`;
+                            displayValue = `<span class="font-bold text-slate-800 dark:text-slate-200">${valStr}</span>`;
                         }
                     }
 
-                    const isGvOrSeismic = col.mode === 'gv' || col.mode === 'pz' || col.mode === 'mrz';
-                    const bgClass = isGvOrSeismic ? 'bg-emerald-50/20 dark:bg-emerald-900/10' : '';
+                    const bgClass = '';
 
                     html += `<td class="${bgClass} py-2.5 px-4 text-center border-b border-slate-100 dark:border-slate-700 border-l border-slate-100/50 dark:border-slate-700/50">${displayValue}</td>`;
                 });
