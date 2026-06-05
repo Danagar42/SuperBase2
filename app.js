@@ -2655,6 +2655,7 @@ window.addEquipmentStressColumn = function() {
     const temp = 100;
     
     equipmentStressColumns.push({ mode, temp });
+    equipmentStressColumns.sort((a, b) => a.temp - b.temp);
     
     saveToLocalStorage();
     renderReportStressTableEquip();
@@ -2671,6 +2672,7 @@ window.updateEquipmentStressColumnMode = function(index, newMode) {
 window.updateEquipmentStressColumnTemp = function(index, newTemp) {
     if (equipmentStressColumns[index]) {
         equipmentStressColumns[index].temp = parseFloat(newTemp);
+        equipmentStressColumns.sort((a, b) => a.temp - b.temp);
         saveToLocalStorage();
         renderReportStressTableEquip();
     }
@@ -2680,17 +2682,6 @@ window.removeEquipmentStressColumn = function(index) {
     equipmentStressColumns.splice(index, 1);
     saveToLocalStorage();
     renderReportStressTableEquip();
-};
-
-window.moveEquipmentStressColumn = function(index, direction) {
-    const newIndex = index + direction;
-    if (newIndex >= 0 && newIndex < equipmentStressColumns.length) {
-        const temp = equipmentStressColumns[index];
-        equipmentStressColumns[index] = equipmentStressColumns[newIndex];
-        equipmentStressColumns[newIndex] = temp;
-        saveToLocalStorage();
-        renderReportStressTableEquip();
-    }
 };
 
 function renderReportTableEquip() {
@@ -2825,9 +2816,6 @@ function renderReportStressTableEquipHeader() {
 
     equipmentStressColumns.forEach((col, idx) => {
         let bgStyleClass = 'bg-slate-50/80 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400';
-        if (col.mode === 'gv') bgStyleClass = 'bg-emerald-50/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
-        else if (col.mode === 'pz' || col.mode === 'mrz') bgStyleClass = 'bg-amber-50/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
-        else if (col.mode === 'pnue' || col.mode === 'as') bgStyleClass = 'bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
 
         let modeSelectOptions = modeOptions.map(opt => 
             `<option value="${opt.value}" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200" ${opt.value === col.mode ? 'selected' : ''}>${opt.label}</option>`
@@ -2835,23 +2823,11 @@ function renderReportStressTableEquipHeader() {
 
         row1 += `
             <th class="py-2 px-2 font-bold text-center border-b border-r border-slate-200 dark:border-slate-700 text-[10px] uppercase tracking-wider relative group ${bgStyleClass} align-middle">
-                <div class="relative inline-block w-full min-w-[90px] px-5">
-                    <!-- Move Left -->
-                    <button onclick="moveEquipmentStressColumn(${idx}, -1)" class="absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-brand-500 transition-all ${idx === 0 ? 'pointer-events-none !opacity-0' : ''}" title="Перемістити ліворуч">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-                    
+                <div class="relative inline-block w-full min-w-[90px] px-3">
                     <select onchange="updateEquipmentStressColumnMode(${idx}, this.value)" class="text-center w-full bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 focus:border-brand-500 outline-none transition-colors text-slate-700 dark:text-slate-200 cursor-pointer font-bold appearance-none" style="text-align-last: center;" title="Змінити режим">
                         ${modeSelectOptions}
                     </select>
-                    
-                    <!-- Move Right -->
-                    <button onclick="moveEquipmentStressColumn(${idx}, 1)" class="absolute right-5.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-brand-500 transition-all ${idx === equipmentStressColumns.length - 1 ? 'pointer-events-none !opacity-0' : ''}" title="Перемістити праворуч">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
-                    
-                    <!-- Delete -->
-                    <button onclick="removeEquipmentStressColumn(${idx})" class="absolute right-0.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
+                    <button onclick="removeEquipmentStressColumn(${idx})" class="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
