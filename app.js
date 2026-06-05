@@ -2642,22 +2642,31 @@ window.toggleReportStressTableEquip = function() {
 };
 
 window.addEquipmentStressColumn = function() {
-    const mode = document.getElementById('equipAddColumnMode').value;
-    const temp = parseFloat(document.getElementById('equipAddColumnTemp').value);
-    
-    const exists = equipmentStressColumns.some(col => col.mode === mode && col.temp === temp);
-    if (exists) {
-        showToast('Такий стовпець вже додано!', 'warning');
-        return;
-    }
+    const mode = 'nue';
+    const temp = 100;
     
     equipmentStressColumns.push({ mode, temp });
-    
-    // Sort columns by temperature to keep it organized
     equipmentStressColumns.sort((a, b) => a.temp - b.temp);
     
     saveToLocalStorage();
     renderReportStressTableEquip();
+};
+
+window.updateEquipmentStressColumnMode = function(index, newMode) {
+    if (equipmentStressColumns[index]) {
+        equipmentStressColumns[index].mode = newMode;
+        saveToLocalStorage();
+        renderReportStressTableEquip();
+    }
+};
+
+window.updateEquipmentStressColumnTemp = function(index, newTemp) {
+    if (equipmentStressColumns[index]) {
+        equipmentStressColumns[index].temp = parseFloat(newTemp);
+        equipmentStressColumns.sort((a, b) => a.temp - b.temp);
+        saveToLocalStorage();
+        renderReportStressTableEquip();
+    }
 };
 
 window.removeEquipmentStressColumn = function(index) {
@@ -2765,11 +2774,25 @@ function renderReportStressTableEquipHeader() {
     const thead = document.getElementById('reportEquipStressTableHeader');
     if (!thead) return;
 
+    const modeOptions = [
+        { value: "gv", label: "ГВ" },
+        { value: "nue", label: "НУЕ, РР" },
+        { value: "pnue", label: "ПНУЕ" },
+        { value: "as", label: "АС" },
+        { value: "pz", label: "ПЗ" },
+        { value: "mrz", label: "МРЗ" }
+    ];
+
     if (equipmentStressColumns.length === 0) {
         thead.innerHTML = `
             <tr>
                 <th rowspan="2" class="sticky-col-header first-col pt-4 pb-3 px-4 font-semibold text-left min-w-[200px] max-w-[250px] border-r border-slate-200 dark:border-slate-700 z-30 align-bottom bg-slate-50 dark:bg-slate-900">Матеріал</th>
                 <th rowspan="2" class="sticky-col-header pt-4 pb-3 px-4 font-semibold text-left min-w-[220px] border-r border-slate-200 dark:border-slate-700 align-bottom bg-slate-50 dark:bg-slate-900">Характеристика \\ Т, °С</th>
+                <th rowspan="2" class="py-3 px-2 text-center min-w-[50px] border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
+                    <button onclick="addEquipmentStressColumn()" class="text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 p-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto" title="Додати стовпець">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14"></path></svg>
+                    </button>
+                </th>
             </tr>
             <tr></tr>
         `;
@@ -2782,41 +2805,54 @@ function renderReportStressTableEquipHeader() {
     `;
     let row2 = '';
 
-    const modeLabels = {
-        gv: "ГВ",
-        nue: "НУЕ, РР",
-        pnue: "ПНУЕ",
-        as: "АС",
-        pz: "ПЗ",
-        mrz: "МРЗ"
-    };
-
     equipmentStressColumns.forEach((col, idx) => {
         let bgStyleClass = 'bg-slate-50/80 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400';
         if (col.mode === 'gv') bgStyleClass = 'bg-emerald-50/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
         else if (col.mode === 'pz' || col.mode === 'mrz') bgStyleClass = 'bg-amber-50/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
         else if (col.mode === 'pnue' || col.mode === 'as') bgStyleClass = 'bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
 
+        let modeSelectOptions = modeOptions.map(opt => 
+            `<option value="${opt.value}" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200" ${opt.value === col.mode ? 'selected' : ''}>${opt.label}</option>`
+        ).join('');
+
         row1 += `
-            <th class="py-2 px-2 font-bold text-center border-b border-r border-slate-200 dark:border-slate-700 text-[10px] uppercase tracking-wider relative group ${bgStyleClass}">
-                <div class="flex items-center justify-center gap-1 min-w-[80px]">
-                    <span>${modeLabels[col.mode]}</span>
-                    <button onclick="removeEquipmentStressColumn(${idx})" class="opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
+            <th class="py-2 px-2 font-bold text-center border-b border-r border-slate-200 dark:border-slate-700 text-[10px] uppercase tracking-wider relative group ${bgStyleClass} align-middle">
+                <div class="relative inline-block w-full min-w-[90px] px-3">
+                    <select onchange="updateEquipmentStressColumnMode(${idx}, this.value)" class="text-center w-full bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 focus:border-brand-500 outline-none transition-colors text-slate-700 dark:text-slate-200 cursor-pointer font-bold appearance-none" style="text-align-last: center;" title="Змінити режим">
+                        ${modeSelectOptions}
+                    </select>
+                    <button onclick="removeEquipmentStressColumn(${idx})" class="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity" title="Видалити стовпець">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
             </th>
         `;
 
+        let tempSelectOptions = temperatures.map(t => 
+            `<option value="${t}" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200" ${t === col.temp ? 'selected' : ''}>${t}</option>`
+        ).join('');
+
         row2 += `
-            <th class="py-2 px-2 font-semibold text-center min-w-[90px] border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300">
-                ${col.temp} °C
+            <th class="py-2 px-2 font-semibold text-center min-w-[90px] border-b border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 align-middle">
+                <div class="relative inline-block w-full px-2">
+                    <select onchange="updateEquipmentStressColumnTemp(${idx}, this.value)" class="text-center w-full bg-transparent border-b border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 focus:border-brand-500 outline-none transition-colors cursor-pointer font-semibold appearance-none" style="text-align-last: center;" title="Змінити температуру">
+                        ${tempSelectOptions}
+                    </select>
+                </div>
             </th>
         `;
     });
 
+    let addBtnHtml1 = `
+        <th rowspan="2" class="py-3 px-2 text-center min-w-[50px] border-b border-slate-200 dark:border-slate-700 align-middle bg-slate-50 dark:bg-slate-900">
+            <button onclick="addEquipmentStressColumn()" class="text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 p-1.5 rounded-lg transition-colors flex items-center justify-center mx-auto" title="Додати стовпець">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14"></path></svg>
+            </button>
+        </th>
+    `;
+
     thead.innerHTML = `
-        <tr>${row1}</tr>
+        <tr>${row1}${addBtnHtml1}</tr>
         <tr>${row2}</tr>
     `;
 }

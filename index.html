@@ -689,45 +689,7 @@
                     <div id="report-content-equipment" class="hidden flex flex-col gap-5 w-full">
                         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col gap-4">
                             <!-- Dynamic column manager, seismic category and features selector -->
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 ml-1">Режим</label>
-                                        <select id="equipAddColumnMode" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer">
-                                            <option value="gv" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">ГВ</option>
-                                            <option value="nue" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">НУЕ, РР</option>
-                                            <option value="pnue" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">ПНУЕ</option>
-                                            <option value="as" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">АС</option>
-                                            <option value="pz" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">НУЕ+ПЗ ПНУЕ+ПЗ</option>
-                                            <option value="mrz" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">НУЕ+МРЗ ПНУЕ+МРЗ</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 ml-1">Температура, °C</label>
-                                        <select id="equipAddColumnTemp" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold rounded-lg p-2 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer">
-                                            <option value="20" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">20</option>
-                                            <option value="50" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">50</option>
-                                            <option value="100" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">100</option>
-                                            <option value="150" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">150</option>
-                                            <option value="200" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">200</option>
-                                            <option value="250" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">250</option>
-                                            <option value="300" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">300</option>
-                                            <option value="350" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">350</option>
-                                            <option value="400" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">400</option>
-                                            <option value="450" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">450</option>
-                                            <option value="500" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">500</option>
-                                            <option value="550" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">550</option>
-                                            <option value="600" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">600</option>
-                                        </select>
-                                    </div>
-                                    <div class="self-end">
-                                        <button onclick="addEquipmentStressColumn()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1.5 active:scale-95 h-[38px]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                            Додати стовпець
-                                        </button>
-                                    </div>
-                                </div>
-
+                            <div class="flex flex-col md:flex-row md:items-center justify-end gap-4">
                                 <div class="flex flex-wrap items-end gap-3 self-stretch md:self-auto justify-end">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 ml-1">Врахування сейсмостійкості</label>
