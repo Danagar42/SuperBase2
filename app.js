@@ -411,7 +411,8 @@ function init() {
         const material = appMaterials[matIndex];
         const grade = material.grades[kpIndex];
         const matName = material.name;
-        const kpName = grade.kp ? `Категорія міцності ${grade.kp}` : 'Без категорії міцності';
+        const cleanDesc = formatDescription(material.name, grade.description);
+        const kpName = grade.kp ? (cleanDesc !== 'Не вказано' ? `КП ${grade.kp} (${cleanDesc})` : `КП ${grade.kp}`) : 'Без КП';
 
         if (activeReportSubTab === 'gaskets') {
             const selectedElements = Array.from(document.querySelectorAll('.report-element-cb:checked')).map(cb => cb.value);
@@ -670,7 +671,7 @@ function renderReportList() {
                 </div>
                 <div class="truncate">
                     <div class="font-bold text-slate-800 dark:text-slate-200 text-xs truncate" title="${item.matName}">${item.matName}</div>
-                    <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">${item.kpName}</div>
+                    <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">${getReportKpName(item)}</div>
                     <div class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 truncate mt-0.5">${(item.elements || []).join(', ')}</div>
                 </div>
             </div>
@@ -910,7 +911,7 @@ function renderReportTable() {
             if (pIdx === 0) {
                 html += `<td rowspan="2" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                     ${index + 1}. ${item.matName}<br>
-                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words whitespace-normal">${getReportKpName(item)}</span>
                 </td>`;
             }
 
@@ -1003,7 +1004,7 @@ function renderReportStressTable() {
                 if (isFirstMatRow) {
                     html += `<td rowspan="${totalRows}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                         ${index + 1}. ${item.matName}<br>
-                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words whitespace-normal">${getReportKpName(item)}</span>
                     </td>`;
                     isFirstMatRow = false;
                 }
@@ -1221,9 +1222,20 @@ function formatDescription(matName, desc) {
     const cleanMatName = matName.replace(" (Демо)", "").replace(" (Копія)", "").trim();
     if (desc.toLowerCase().startsWith(cleanMatName.toLowerCase())) {
         desc = desc.substring(cleanMatName.length).replace(/^[.,\-;\s]+/, '').trim();
-        if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
     }
+    // Remove trailing (КП <number>) or similar
+    desc = desc.replace(/,?\s*\(\s*КП\s*\d+\s*\)\s*$/, '').trim();
+    if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
     return desc || 'Не вказано';
+}
+
+function getReportKpName(item) {
+    const material = appMaterials[item.matIndex];
+    if (!material) return item.kpName || 'Без КП';
+    const grade = material.grades[item.kpIndex];
+    if (!grade) return item.kpName || 'Без КП';
+    const cleanDesc = formatDescription(material.name, grade.description);
+    return grade.kp ? (cleanDesc !== 'Не вказано' ? `КП ${grade.kp} (${cleanDesc})` : `КП ${grade.kp}`) : 'Без КП';
 }
 
 function updateKpList() {
@@ -1237,7 +1249,7 @@ function updateKpList() {
         const option = document.createElement('option');
         option.value = index;
         
-        let label = grade.kp ? `Категорія міцності ${grade.kp}` : "Без категорії міцності";
+        let label = grade.kp ? `КП ${grade.kp}` : "Без КП";
         const cleanDesc = formatDescription(appMaterials[matIndex].name, grade.description);
         if (cleanDesc !== 'Не вказано') {
             let preview = cleanDesc.length > 50 ? cleanDesc.substring(0, 50) + '...' : cleanDesc;
@@ -2752,7 +2764,7 @@ function renderReportTableEquip() {
             if (pIdx === 0) {
                 html += `<td rowspan="${activeProps.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                     ${index + 1}. ${item.matName}<br>
-                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words whitespace-normal">${getReportKpName(item)}</span>
                 </td>`;
             }
 
@@ -2963,7 +2975,7 @@ function renderReportStressTableEquip() {
                 if (pIdx === 0) {
                     html += `<td rowspan="${el.props.length}" class="sticky-col bg-white dark:bg-slate-800 py-2.5 px-4 text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 align-middle border-r border-slate-200 dark:border-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10 w-[240px] min-w-[240px] max-w-[240px]">
                         ${matIdx + 1}. ${item.matName}<br>
-                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words max-w-[200px] whitespace-normal">${item.kpName}</span>
+                        <span class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5 block leading-tight break-words whitespace-normal">${getReportKpName(item)}</span>
                     </td>`;
                 }
 
