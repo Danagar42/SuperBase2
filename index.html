@@ -26,7 +26,7 @@
     <script src="data.js"></script>
 
 
-    <link rel="stylesheet" href="styles.css?v=20261110-tooltip-fix-1">
+    <link rel="stylesheet" href="styles.css?v=20261110-ui-consistency-1">
 </head>
 <body class="text-slate-800 dark:text-slate-200 h-screen flex flex-col overflow-hidden antialiased relative">
 
@@ -173,35 +173,37 @@
                             </button>
                         </div>
                     </div>
+                    <button type="button" id="btnOpenAddMat" class="sb-add-material" aria-label="Додати власний матеріал">
+                        <span aria-hidden="true">＋</span> Додати власний матеріал
+                    </button>
                 </div>
 
-                <button type="button" id="btnOpenAddMat" aria-label="Додати власний матеріал" class="w-full bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 border-2 border-dashed border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-400 text-sm font-semibold py-3 px-4 rounded-2xl transition-all flex items-center justify-center gap-2 group shadow-sm shrink-0">
-                    <div class="bg-brand-100 dark:bg-brand-900/50 p-1 rounded-md group-hover:scale-110 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <!-- Secondary data tools: one visual group, kept below material selection -->
+                <section id="defaultSidebarActions" class="sb-sidebar-utilities mt-auto" aria-labelledby="sidebarDataToolsTitle">
+                    <h3 id="sidebarDataToolsTitle" class="sb-sidebar-utilities-title">Дані та резервні копії</h3>
+                    <div class="sb-data-status-group">
+                        <div id="dataSaveStatus" class="sb-save-status" role="status" aria-live="polite" title="Матеріали й списки звітів зберігаються в браузері. Для перенесення бази замініть data.js експортованим файлом.">
+                            <span id="dataSaveStatusDot" class="sb-save-dot" aria-hidden="true"></span>
+                            <div class="min-w-0"><div id="dataSaveStatusLabel" class="sb-save-title">Стан даних</div><div id="dataSaveStatusInfo" class="sb-save-info">Перевірка…</div></div>
+                        </div>
+                        <button type="button" id="btnSyncDetails" class="sb-sync-details" title="Перевірити зміни між браузером і data.js">Переглянути зміни</button>
                     </div>
-                    Додати власний матеріал
-                </button>
-
-                <div id="defaultSidebarActions" class="mt-auto flex flex-col gap-2.5 transition-opacity">
-                    <div id="dataSaveStatus" class="sb-save-status" role="status" aria-live="polite" title="Матеріали й списки звітів зберігаються в браузері. Для перенесення бази замініть data.js експортованим файлом.">
-                        <span id="dataSaveStatusDot" class="sb-save-dot"></span>
-                        <div class="min-w-0"><div id="dataSaveStatusLabel" class="sb-save-title">Стан даних</div><div id="dataSaveStatusInfo" class="sb-save-info">Перевірка…</div></div>
+                    <button type="button" id="btnExportJS" class="sb-sidebar-action sb-sidebar-action--primary" title="Завантажити базу матеріалів у файл data.js (встановлюється вручну)">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 12v6m-3-3 3 3 3-3"/></svg>
+                        Завантажити базу (data.js)
+                    </button>
+                    <div class="sb-sidebar-action-row" role="group" aria-label="Резервна копія у форматі JSON">
+                        <button type="button" id="btnExportBackupJSON" class="sb-sidebar-action" title="Зберегти повний стан: матеріали, звіти й налаштування у JSON-файл">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg>
+                            Зберегти JSON
+                        </button>
+                        <button type="button" id="btnImportBackupJSON" class="sb-sidebar-action" title="Відновити матеріали, звіти й налаштування з резервної копії JSON">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg>
+                            Відновити JSON
+                        </button>
                     </div>
-                    <button type="button" id="btnSyncDetails" class="sb-sync-details" title="Перевірити зміни між браузером і data.js">Переглянути зміни для data.js</button>
-                    <button type="button" id="btnExportJS" aria-label="Завантажити базу (data.js)" title="Завантажити базу матеріалів у файл data.js" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        <span>Експорт в JS Код</span>
-                    </button>
-                    <button type="button" id="btnExportBackupJSON" aria-label="Експорт резервної копії (JSON)" title="Зберегти повний стан (матеріали, звіти, налаштування) у JSON-файл" class="w-full bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-indigo-200 dark:border-indigo-800/60 shadow-sm flex items-center justify-center gap-2 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Експорт резервної копії (JSON)</span>
-                    </button>
-                    <button type="button" id="btnImportBackupJSON" aria-label="Імпорт резервної копії (JSON)" title="Відновити повний стан із файлу резервної копії JSON" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <span>Імпорт резервної копії (JSON)</span>
-                    </button>
                     <input type="file" id="importBackupFileInput" accept=".json,application/json" class="hidden">
-                </div>
+                </section>
 
                 <div id="reportSidebarActions" class="hidden mt-auto flex-col gap-3">
                     <div class="flex items-stretch gap-2 min-w-0">
@@ -232,9 +234,9 @@
             <div id="empty-state" class="hidden h-full flex-col items-center justify-center text-center p-8 modal-animate">
                 <div class="relative flex items-center justify-center mb-6">
                     <!-- Ambient pulsing glow -->
-                    <div class="absolute w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+                    <div class="absolute w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl"></div>
                     <!-- Isometric 3D SVG Composition -->
-                    <svg width="130" height="130" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative z-10 animate-bounce" style="animation-duration: 4s; animation-iteration-count: infinite;">
+                    <svg width="130" height="130" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative z-10">
                          <!-- Base shadow shadow-glow -->
                          <ellipse cx="60" cy="100" rx="30" ry="8" fill="rgba(0, 0, 0, 0.08)" />
                          
@@ -313,19 +315,11 @@
                         </div>
                     </div>
                     
-                    <div class="bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl flex space-x-1 shrink-0 border border-slate-200/50 dark:border-slate-700 w-full xl:w-auto overflow-x-auto">
-                        <button id="tab-btn-table" onclick="switchTab('table')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm border border-slate-200/50 dark:border-slate-600 transition-all focus:outline-none whitespace-nowrap">
-                            Властивості
-                        </button>
-                        <button id="tab-btn-calc" onclick="switchTab('calc')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
-                            Напруження [&sigma;]
-                        </button>
-                        <button id="tab-btn-chart" onclick="switchTab('chart')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
-                            Графіки
-                        </button>
-                        <button id="tab-btn-report" onclick="switchTab('report')" class="flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap">
-                            Для звіту
-                        </button>
+                    <div id="mainTabSegmented" class="sb-segmented sb-segmented--primary" role="tablist" aria-label="Розділи довідника">
+                        <button type="button" id="tab-btn-table" role="tab" aria-controls="view-table" aria-selected="true" tabindex="0" onclick="switchTab('table')" class="sb-segmented__option is-active">Властивості</button>
+                        <button type="button" id="tab-btn-calc" role="tab" aria-controls="view-calc" aria-selected="false" tabindex="-1" onclick="switchTab('calc')" class="sb-segmented__option">Напруження [&sigma;]</button>
+                        <button type="button" id="tab-btn-chart" role="tab" aria-controls="view-chart" aria-selected="false" tabindex="-1" onclick="switchTab('chart')" class="sb-segmented__option">Графіки</button>
+                        <button type="button" id="tab-btn-report" role="tab" aria-controls="view-report" aria-selected="false" tabindex="-1" onclick="switchTab('report')" class="sb-segmented__option">Для звіту</button>
                     </div>
                 </div>
 
@@ -352,7 +346,7 @@
                                 <div class="relative">
                                     <input type="number" id="calcTemp" value="20" min="20" max="600" class="w-full bg-brand-50 dark:bg-slate-900 border border-brand-200 dark:border-slate-700 text-brand-700 dark:text-brand-400 rounded-xl focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
-                                <input type="range" id="calcTempSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
+                                <input type="range" id="calcTempSlider" min="20" max="600" value="20" step="5" class="sb-temp-range" aria-label="Робоча температура, °C">
                             </div>
                             <div class="min-w-0 flex flex-col gap-2">
                                 <label class="flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 tooltip-trigger cursor-help" data-tooltip="Властивості для гідравлічних випробувань беруться консервативно до найближчої більшої температури стандарту.">
@@ -362,21 +356,17 @@
                                 <div class="relative">
                                     <input type="number" id="calcTempGv" value="20" min="20" max="600" class="w-full bg-indigo-50 dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
-                                <input type="range" id="calcTempGvSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
+                                <input type="range" id="calcTempGvSlider" min="20" max="600" value="20" step="5" class="sb-temp-range" aria-label="Температура ГВ, °C">
                             </div>
                             <div class="min-w-0 flex flex-col gap-2 sb-seismic-field">
                                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Сейсмостійкість</label>
                                 <select id="calcSeismic" class="sr-only" aria-label="Категорія сейсмостійкості">
-                                    <option value="1">І категорія</option>
-                                    <option value="2">ІІ категорія</option>
+                                    <option value="1">I категорія</option>
+                                    <option value="2">II категорія</option>
                                 </select>
-                                <div id="calcSeismicSegmented" class="sb-segmented-control" role="group" aria-label="Категорія сейсмостійкості">
-                                    <button type="button" class="sb-segmented-option" data-value="1" aria-pressed="true">
-                                        <span class="sb-segmented-label">І категорія</span>
-                                    </button>
-                                    <button type="button" class="sb-segmented-option" data-value="2" aria-pressed="false">
-                                        <span class="sb-segmented-label">ІІ категорія</span>
-                                    </button>
+                                <div id="calcSeismicSegmented" class="sb-segmented sb-segmented--seismic" role="group" aria-label="Категорія сейсмостійкості">
+                                    <button type="button" class="sb-segmented__option is-active" data-value="1" aria-pressed="true">I категорія</button>
+                                    <button type="button" class="sb-segmented__option" data-value="2" aria-pressed="false">II категорія</button>
                                 </div>
                             </div>
                         </div>
@@ -411,12 +401,12 @@
                         <div id="calcAuditPanel" class="hidden bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 p-4 rounded-2xl text-xs font-semibold shadow-sm border border-emerald-200/50 dark:border-emerald-900/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 mb-5 relative overflow-hidden">
                             <div class="flex items-center gap-3">
                                 <span class="flex h-3 w-3 relative shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" id="auditPing"></span>
+                                    <span class="hidden" id="auditPing"></span>
                                     <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" id="auditStatusDot"></span>
                                 </span>
                                 <div class="leading-tight">
                                     <div class="font-bold text-sm uppercase tracking-wider mb-0.5" id="auditStatusTitle">Параметри розрахунку: Норма</div>
-                                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" id="auditStatusDesc">Розрахунок відповідає вимогам нормативності ПНАЕ G-7-002-86.</div>
+                                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" id="auditStatusDesc">Використано нормативні коефіцієнти ПНАЕ Г-7-002-86.</div>
                                 </div>
                             </div>
                             <div class="hidden text-left sm:text-right text-[11px] font-bold space-y-0.5 max-w-full sm:max-w-[50%] text-slate-600 dark:text-slate-400" id="auditWarningList"></div>
@@ -651,23 +641,23 @@
                 <div id="view-report" class="tab-pane hidden overflow-y-auto overflow-x-hidden flex-col self-start max-h-full w-full min-h-0 gap-5 scroll-smooth p-1">
                     <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 shrink-0">
                         <!-- Sub-tab Switcher -->
-                        <div class="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl self-start">
-                            <button onclick="switchReportSubTab('gaskets')" id="btnReportSubTabGaskets" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100">
-                                Для прокладок
-                            </button>
-                            <button onclick="switchReportSubTab('equipment')" id="btnReportSubTabEquipment" class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
-                                Для обладнання
-                            </button>
+                        <div id="reportTabSegmented" class="sb-segmented sb-segmented--sub self-start" role="tablist" aria-label="Тип звіту">
+                            <button type="button" role="tab" aria-controls="report-content-gaskets" aria-selected="true" tabindex="0" onclick="switchReportSubTab('gaskets')" id="btnReportSubTabGaskets" class="sb-segmented__option is-active">Для прокладок</button>
+                            <button type="button" role="tab" aria-controls="report-content-equipment" aria-selected="false" tabindex="-1" onclick="switchReportSubTab('equipment')" id="btnReportSubTabEquipment" class="sb-segmented__option">Для обладнання</button>
                         </div>
 
                         <!-- Equipment-specific controls inline -->
                         <div id="reportEquipControls" class="hidden flex-wrap items-center gap-3">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Сейсмічність:</span>
-                                <select id="reportEquipSeismic" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/20 text-xs font-bold rounded-lg px-2.5 py-1.5 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none transition-colors cursor-pointer h-9">
-                                    <option value="1" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">I Категорія</option>
-                                    <option value="2" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">II Категорія</option>
+                                <select id="reportEquipSeismic" class="sr-only" aria-label="Категорія сейсмостійкості у звіті">
+                                    <option value="1">I категорія</option>
+                                    <option value="2">II категорія</option>
                                 </select>
+                                <div id="reportEquipSeismicSegmented" class="sb-segmented sb-segmented--seismic sb-segmented--compact" role="group" aria-label="Категорія сейсмостійкості у звіті">
+                                    <button type="button" class="sb-segmented__option is-active" data-value="1" aria-pressed="true">I категорія</button>
+                                    <button type="button" class="sb-segmented__option" data-value="2" aria-pressed="false">II категорія</button>
+                                </div>
                             </div>
                             <button type="button" id="btnToggleEquipProps" class="bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold py-1.5 px-3 rounded-lg border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-1.5 active:scale-95 h-9">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1078,7 +1068,7 @@
         </main>
     </div>
 
-    <script src="app.js?v=20261110-tooltip-fix-1" defer></script>
+    <script src="app.js?v=20261110-ui-consistency-1" defer></script>
     <!-- Швидкий пошук (Ctrl + K) -->
     <div id="quickSearchOverlay" class="sb-command-overlay" hidden>
         <div id="quickSearchBackdrop" class="sb-command-backdrop"></div>

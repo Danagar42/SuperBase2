@@ -1537,38 +1537,120 @@ function initSyncDetails() {
 }
 
 
-function initSeismicSegmented() {
-    const select = document.getElementById('calcSeismic');
-    const wrapper = document.getElementById('calcSeismicSegmented');
+function setSegmentedSelection(buttons, selected, isTab = false) {
+    buttons.forEach(button => {
+        const active = button === selected;
+        button.classList.toggle('is-active', active);
+        if (isTab) {
+            button.setAttribute('aria-selected', active ? 'true' : 'false');
+            button.tabIndex = active ? 0 : -1;
+        } else {
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+    });
+}
+
+function initSegmentedKeyboard(groupId) {
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    const buttons = Array.from(group.querySelectorAll('[role="tab"]'));
+    group.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        const index = buttons.indexOf(document.activeElement);
+        if (index < 0) return;
+        event.preventDefault();
+        let next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1
+            : (index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
+        buttons[next].focus();
+        buttons[next].click();
+    });
+}
+
+function bindSegmentedSelect(selectId, segmentedId) {
+    const select = document.getElementById(selectId);
+    const wrapper = document.getElementById(segmentedId);
     if (!select || !wrapper) return;
-
-    const buttons = Array.from(wrapper.querySelectorAll('.sb-segmented-option[data-value]'));
-    if (!buttons.length) return;
-
+    const buttons = Array.from(wrapper.querySelectorAll('.sb-segmented__option[data-value]'));
     const syncButtons = () => {
         const value = select.value === '2' ? '2' : '1';
-        buttons.forEach(btn => {
-            const active = btn.dataset.value === value;
-            btn.classList.toggle('is-active', active);
-            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
+        setSegmentedSelection(buttons, buttons.find(btn => btn.dataset.value === value));
     };
-
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const nextValue = btn.dataset.value === '2' ? '2' : '1';
-            if (select.value !== nextValue) {
-                select.value = nextValue;
-                // One change event is sufficient: updateCalculator listens to both
-                // input and change, so firing both would recalculate twice.
-                select.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            syncButtons();
-        });
-    });
-
+    buttons.forEach(button => button.addEventListener('click', () => {
+        const nextValue = button.dataset.value === '2' ? '2' : '1';
+        if (select.value !== nextValue) {
+            select.value = nextValue;
+            // A single change event updates the calculator or the report and persists its state.
+            select.dispatchEvent(new Event('change', { bubbles:true }));
+        }
+        syncButtons();
+    }));
     select.addEventListener('change', syncButtons);
     syncButtons();
+}
+
+function initTemperatureRuler(slider) {
+    if (!slider) return () => {};
+    const ruler = document.createElement('div');
+    ruler.className = 'sb-temperature-ruler';
+    ruler.setAttribute('aria-hidden', 'true');
+    const min = Number(slider.min), max = Number(slider.max);
+    temperatures.forEach(value => {
+        const tick = document.createElement('span');
+        tick.className = 'sb-temperature-ruler__tick';
+        tick.style.left = `${((value - min) / (max - min)) * 100}%`;
+        tick.dataset.temperature = String(value);
+        ruler.appendChild(tick);
+    });
+    const startLabel = document.createElement('span');
+    startLabel.className = 'sb-temperature-ruler__label sb-temperature-ruler__label--start';
+    startLabel.textContent = `${min}°`;
+    const endLabel = document.createElement('span');
+    endLabel.className = 'sb-temperature-ruler__label sb-temperature-ruler__label--end';
+    endLabel.textContent = `${max}°`;
+    ruler.append(startLabel, endLabel);
+    slider.insertAdjacentElement('afterend', ruler);
+    let previousStep = Number(slider.value);
+    const sync = (feedback = false) => {
+        const value = Number(slider.value);
+        const percent = Math.max(0, Math.min(100, 100 * (value - min) / (max - min)));
+        slider.style.setProperty('--sb-range-fill', `${percent}%`);
+        slider.setAttribute('aria-valuetext', `${value} °C`);
+        ruler.querySelectorAll('[data-temperature]').forEach(tick => {
+            const temp = Number(tick.dataset.temperature);
+            tick.classList.toggle('is-passed', temp < value);
+            tick.classList.toggle('is-current', Math.abs(temp - value) < Number(slider.step) / 2);
+        });
+        if (feedback && value !== previousStep && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            slider.classList.remove('sb-range-stepped');
+            void slider.offsetWidth;
+            slider.classList.add('sb-range-stepped');
+            clearTimeout(slider._sbStepTimer);
+            slider._sbStepTimer = setTimeout(() => slider.classList.remove('sb-range-stepped'), 130);
+        }
+        previousStep = value;
+    };
+    slider.addEventListener('input', () => sync(true));
+    sync();
+    return sync;
+}
+
+// Visual feedback does not alter the exact calculated value or clipboard content.
+function snapshotCalculatorValues() {
+    const values = new Map();
+    document.querySelectorAll('#view-calc [id] > .sb-animated-number').forEach(node => {
+        values.set(node.parentElement.id, node.textContent);
+    });
+    return values;
+}
+function animateCommittedCalculatorValues(before) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('#view-calc [id] > .sb-animated-number').forEach(node => {
+        if (before.has(node.parentElement.id) && before.get(node.parentElement.id) !== node.textContent) {
+            node.classList.remove('sb-number-updated');
+            void node.offsetWidth;
+            node.classList.add('sb-number-updated');
+        }
+    });
 }
 
 function init() {
@@ -1578,7 +1660,10 @@ function init() {
     updateDataSaveStatus();
     initQuickSearch();
     initReportCopyButtons();
-    initSeismicSegmented();
+    bindSegmentedSelect('calcSeismic', 'calcSeismicSegmented');
+    bindSegmentedSelect('reportEquipSeismic', 'reportEquipSeismicSegmented');
+    initSegmentedKeyboard('mainTabSegmented');
+    initSegmentedKeyboard('reportTabSegmented');
 
     let headerHtml = `<th class="sticky-col-header first-col py-3.5 px-4 font-semibold text-left min-w-[280px]">Характеристика \\ Т, °С</th>`;
     temperatures.forEach(t => { 
@@ -1608,31 +1693,24 @@ function init() {
     const calcTempGv = document.getElementById('calcTempGv');
     const calcTempGvSlider = document.getElementById('calcTempGvSlider');
 
-    if (calcTemp && calcTempSlider) {
-        calcTempSlider.addEventListener('input', (e) => {
-            calcTemp.value = e.target.value;
+    [[calcTemp, calcTempSlider], [calcTempGv, calcTempGvSlider]].forEach(([field, slider]) => {
+        if (!field || !slider) return;
+        const syncRuler = initTemperatureRuler(slider);
+        slider.addEventListener('input', () => {
+            const previous = snapshotCalculatorValues();
+            field.value = slider.value;
             updateCalculator();
+            animateCommittedCalculatorValues(previous);
         });
-        calcTemp.addEventListener('input', (e) => {
-            let val = parseFloat(e.target.value);
-            if (!isNaN(val)) {
-                calcTempSlider.value = Math.max(20, Math.min(600, val));
+        field.addEventListener('input', () => {
+            const value = Number(field.value);
+            if (Number.isFinite(value) && field.value.trim() !== '') {
+                slider.value = String(Math.max(Number(slider.min), Math.min(Number(slider.max), value)));
+                // Sync only the ruler; the number-input event already recalculated the real result.
+                syncRuler();
             }
         });
-    }
-
-    if (calcTempGv && calcTempGvSlider) {
-        calcTempGvSlider.addEventListener('input', (e) => {
-            calcTempGv.value = e.target.value;
-            updateCalculator();
-        });
-        calcTempGv.addEventListener('input', (e) => {
-            let val = parseFloat(e.target.value);
-            if (!isNaN(val)) {
-                calcTempGvSlider.value = Math.max(20, Math.min(600, val));
-            }
-        });
-    }
+    });
 
     document.getElementById('devModeToggle').addEventListener('change', (e) => {
         isDevMode = e.target.checked;
@@ -1968,14 +2046,13 @@ function switchTab(tab) {
     const headerMaterialInfo = document.getElementById('headerMaterialInfo');
     const headerReportInfo = document.getElementById('headerReportInfo');
     
-    const activeClass = "flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-semibold bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm border border-slate-200/50 dark:border-slate-600 transition-all focus:outline-none whitespace-nowrap";
-    const inactiveClass = "flex-1 sm:flex-none py-2 px-4 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none border border-transparent whitespace-nowrap";
-
     [viewTable, viewCalc, viewChart, viewReport].forEach(v => {
         v.classList.add('hidden');
         v.classList.remove('tab-active');
     });
-    [btnTable, btnCalc, btnChart, btnReport].forEach(b => b.className = inactiveClass);
+    const tabs = [btnTable, btnCalc, btnChart, btnReport];
+    const activeTab = { table:btnTable, calc:btnCalc, chart:btnChart, report:btnReport }[tab];
+    setSegmentedSelection(tabs, activeTab, true);
 
     if (tab === 'report') {
         reportActions.classList.remove('hidden');
@@ -2006,18 +2083,14 @@ function switchTab(tab) {
     let activeView = null;
     if (tab === 'table') {
         activeView = viewTable;
-        btnTable.className = activeClass;
     } else if (tab === 'calc') {
         activeView = viewCalc;
-        btnCalc.className = activeClass;
         updateCalculator();
     } else if (tab === 'chart') {
         activeView = viewChart;
-        btnChart.className = activeClass;
         renderChart();
     } else if (tab === 'report') {
         activeView = viewReport;
-        btnReport.className = activeClass;
         renderReportList();
     }
 
@@ -3478,10 +3551,10 @@ function renderCell(id, value, formulaStr) {
         const wrappedFormula = wrapFormulaVars(formulaStr);
         el.innerHTML = `
             <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono mb-1 leading-tight whitespace-nowrap tracking-tight font-medium">${wrappedFormula}</div>
-            <div class="text-base leading-tight font-semibold">${valStr}</div>
+            <div class="sb-animated-number text-base leading-tight font-semibold">${valStr}</div>
         `;
     } else {
-        el.innerHTML = `<span class="font-semibold">${valStr}</span>`;
+        el.innerHTML = `<span class="sb-animated-number font-semibold">${valStr}</span>`;
     }
 }
 
@@ -3775,7 +3848,7 @@ function updateCalculator() {
         if (isCritical) {
             auditPanel.classList.add('bg-rose-50/50', 'dark:bg-rose-950/20', 'text-rose-800', 'dark:text-rose-300', 'border-rose-200/50', 'dark:border-rose-900/30');
             auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-rose-500";
-            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75";
+            if (auditPing) auditPing.className = "hidden";
             auditTitle.textContent = "Розрахунок заблоковано";
             auditDesc.textContent = "Введено некоректні значення коефіцієнтів (> 0) або температур. Розрахунок призупинено.";
             auditWarnings.classList.remove('hidden');
@@ -3783,7 +3856,7 @@ function updateCalculator() {
         } else if (warnings.length > 0) {
             auditPanel.classList.add('bg-amber-50/50', 'dark:bg-amber-950/20', 'text-amber-800', 'dark:text-amber-300', 'border-amber-200/50', 'dark:border-amber-900/30');
             auditDot.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
-            if (auditPing) auditPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
+            if (auditPing) auditPing.className = "hidden";
             auditTitle.textContent = "Аудит: Застереження";
             auditDesc.textContent = "Виявлено нестандартні коефіцієнти розрахунку або вихід за межі температурної сітки матеріалу.";
             
@@ -4916,6 +4989,14 @@ function copyHTMLFallback(html, text) {
     }
 }
 
+function flashCopiedTable(table) {
+    if (!table) return;
+    table.classList.remove('sb-copied-table');
+    void table.offsetWidth;
+    table.classList.add('sb-copied-table');
+    setTimeout(() => table.classList.remove('sb-copied-table'), 460);
+}
+
 async function copyReportTable(source) {
     if (!source.tHead?.rows.length || !source.tBodies[0]?.rows.length ||
         source.tBodies[0].rows[0].cells.length === 1) {
@@ -4937,6 +5018,7 @@ async function copyReportTable(source) {
             return;
         }
     }
+    flashCopiedTable(source);
     showToast('Таблицю скопійовано. Вставте у Word за допомогою Ctrl+V.', 'success');
 }
 
@@ -5097,7 +5179,7 @@ document.addEventListener('copy', (e) => {
                 inp.style.transition = '';
                 inp.style.backgroundColor = '';
                 inp.style.color = '';
-            }, 150);
+            }, 420);
         });
         return;
     }
@@ -5115,7 +5197,7 @@ document.addEventListener('copy', (e) => {
         td.classList.add('cell-copied');
         setTimeout(() => {
             td.classList.remove('cell-copied');
-        }, 100); 
+        }, 450);
     });
 });
 }
@@ -5129,10 +5211,9 @@ window.switchReportSubTab = function(tab) {
     const actionsGaskets = document.getElementById('reportActionsGaskets');
     const actionsEquipment = document.getElementById('reportActionsEquipment');
     const equipControls = document.getElementById('reportEquipControls');
+    setSegmentedSelection([btnGaskets, btnEquip], tab === 'gaskets' ? btnGaskets : btnEquip, true);
 
     if (tab === 'gaskets') {
-        btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
-        btnEquip.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
         contentGaskets.classList.remove('hidden');
         contentEquip.classList.add('hidden');
         actionsGaskets.classList.remove('hidden');
@@ -5142,8 +5223,6 @@ window.switchReportSubTab = function(tab) {
             equipControls.classList.remove('flex');
         }
     } else {
-        btnEquip.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 shadow-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100";
-        btnGaskets.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
         contentGaskets.classList.add('hidden');
         contentEquip.classList.remove('hidden');
         actionsGaskets.classList.add('hidden');
