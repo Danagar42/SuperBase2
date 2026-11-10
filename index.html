@@ -17,36 +17,16 @@
         }
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Системний шрифт: без зовнішніх запитів до Google Fonts -->
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/tailwind-local.css">
+    <script src="assets/superbase-chart.js"></script>
     
     <!-- Підключаємо зовнішню базу даних (якщо є) -->
     <script src="data.js"></script>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe',
-                            500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
-                        },
-                        dark: {
-                            bg: '#080b11', panel: '#111625', border: '#1e2640'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="styles.css?v=20261110-tooltip-fix-1">
 </head>
 <body class="text-slate-800 dark:text-slate-200 h-screen flex flex-col overflow-hidden antialiased relative">
 
@@ -55,7 +35,7 @@
     <header class="glass-panel brand-glow border-b border-slate-200 dark:border-dark-border z-40 flex items-center shrink-0 transition-colors h-[72px]">
         
         <!-- Ліва частина (логотип) - ширина збігається з боковим меню -->
-        <div class="w-auto md:w-[340px] shrink-0 h-full flex items-center md:justify-center relative px-4 md:px-0">
+        <div class="w-auto md:w-[340px] shrink-0 h-full flex items-center md:justify-center relative pl-5 pr-4 md:pl-6 md:pr-0">
             <svg viewBox="0 0 221 39" class="h-8 md:h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
                  <g>
                   <g id="svg_1">
@@ -74,6 +54,9 @@
                   <text xml:space="preserve" text-anchor="start" font-family="Inter, sans-serif" font-weight="500" font-size="8.5" y="37" x="42" stroke-width="0" fill="currentColor" class="text-slate-800 dark:text-white">Філія «ВП «Науково-технічний центр»</text>
                  </g>
             </svg>
+            <button type="button" id="btnToggleSidebar" aria-label="Згорнути/розгорнути бічну панель" title="Згорнути/розгорнути бічну панель" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+            </button>
             <!-- Короткий роздільник -->
             <div class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
         </div>
@@ -87,7 +70,16 @@
                 </span>
             </h1>
 
-            <div class="flex items-center gap-3 ml-auto">
+            <div class="sb-history-toolbar" role="group" aria-label="Історія змін SuperBase">
+                <button type="button" id="btnUndo" title="Скасувати останню зміну (Ctrl+Z)" aria-label="Скасувати останню зміну" disabled>↶ <span class="sb-history-label">Скасувати</span></button>
+                <button type="button" id="btnRedo" title="Повторити скасовану зміну (Ctrl+Y)" aria-label="Повторити зміну" disabled>↷ <span class="sb-history-label">Повторити</span></button>
+                <button type="button" id="btnShowHistory" title="Історія змін поточного сеансу" aria-label="Історія змін">☷ <span class="sb-history-label">Історія</span></button>
+            </div>
+            <div class="flex items-center gap-2.5 ml-auto">
+                <a href="шпаргалка/index.html" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm" title="Шпаргалка ANSYS / ПНАЕ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <span>Шпаргалка</span>
+                </a>
                 <button id="themeToggle" aria-label="Перемикач теми" title="Перемикач теми" class="p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
                     <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
@@ -99,7 +91,7 @@
     <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
         
         <!-- Ліва панель -->
-        <aside class="w-full md:w-[340px] glass-panel border-r border-slate-200 dark:border-dark-border flex flex-col shrink-0 overflow-hidden z-20">
+        <aside id="mainSidebar" class="w-full md:w-[340px] glass-panel border-r border-slate-200 dark:border-dark-border flex flex-col shrink-0 overflow-hidden z-20">
             <div class="p-5 flex flex-col gap-6 overflow-y-auto h-full">
                 
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60">
@@ -114,13 +106,14 @@
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
                                     <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 </div>
-                                <input type="text" id="searchInput" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block w-full pl-10 p-2.5 outline-none transition-all" placeholder="Пошук (напр. Ст3сп5)...">
+                                <input type="text" id="searchInput" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block w-full pl-10 pr-20 p-2.5 outline-none transition-all" placeholder="Пошук (напр. Ст3сп5)..." title="Швидкий пошук: Ctrl + K">
+                                <button type="button" id="btnOpenQuickSearch" class="sb-open-quick-search" aria-label="Відкрити швидкий пошук, Ctrl+K" title="Відкрити швидкий пошук (Ctrl+K)"><kbd>Ctrl+K</kbd></button>
                             </div>
                         </div>
 
                         <!-- Нещодавно переглянуті матеріали -->
                         <div id="recentMaterialsWrapper" class="hidden border-b border-slate-100 dark:border-slate-700/60 pb-3">
-                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-2 ml-1 uppercase tracking-wider">Нещодавно переглянуті</label>
+                            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 mb-2 ml-1 uppercase tracking-wider">Нещодавно переглянуті</label>
                             <div id="recentMaterialsList" class="flex flex-wrap gap-1.5 ml-1"></div>
                         </div>
 
@@ -189,30 +182,49 @@
                     Додати власний матеріал
                 </button>
 
-                <div id="defaultSidebarActions" class="mt-auto flex flex-col gap-6 transition-opacity">
-                    <button type="button" id="btnExportJS" aria-label="Отримати код бази" title="Отримати код бази для оновлення data.js" class="w-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-sm font-semibold py-3 px-4 rounded-2xl transition-all border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center justify-center gap-2 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <div id="defaultSidebarActions" class="mt-auto flex flex-col gap-2.5 transition-opacity">
+                    <div id="dataSaveStatus" class="sb-save-status" role="status" aria-live="polite" title="Матеріали й списки звітів зберігаються в браузері. Для перенесення бази замініть data.js експортованим файлом.">
+                        <span id="dataSaveStatusDot" class="sb-save-dot"></span>
+                        <div class="min-w-0"><div id="dataSaveStatusLabel" class="sb-save-title">Стан даних</div><div id="dataSaveStatusInfo" class="sb-save-info">Перевірка…</div></div>
+                    </div>
+                    <button type="button" id="btnSyncDetails" class="sb-sync-details" title="Перевірити зміни між браузером і data.js">Переглянути зміни для data.js</button>
+                    <button type="button" id="btnExportJS" aria-label="Завантажити базу (data.js)" title="Завантажити базу матеріалів у файл data.js" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <span>Експорт в JS Код</span>
                     </button>
+                    <button type="button" id="btnExportBackupJSON" aria-label="Експорт резервної копії (JSON)" title="Зберегти повний стан (матеріали, звіти, налаштування) у JSON-файл" class="w-full bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-indigo-200 dark:border-indigo-800/60 shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Експорт резервної копії (JSON)</span>
+                    </button>
+                    <button type="button" id="btnImportBackupJSON" aria-label="Імпорт резервної копії (JSON)" title="Відновити повний стан із файлу резервної копії JSON" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Імпорт резервної копії (JSON)</span>
+                    </button>
+                    <input type="file" id="importBackupFileInput" accept=".json,application/json" class="hidden">
                 </div>
 
                 <div id="reportSidebarActions" class="hidden mt-auto flex-col gap-3">
-                    <button type="button" id="btnToggleReportList" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 text-sm font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-between shadow-sm">
+                    <div class="flex items-stretch gap-2 min-w-0">
+                    <button type="button" id="btnToggleReportList" class="flex-1 min-w-0 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 text-sm font-bold py-3 px-3 rounded-xl transition-all flex items-center justify-between shadow-sm">
                         <span class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                             <span id="reportListToggleText">Показати список (0)</span>
                         </span>
                         <svg id="reportListToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <button type="button" id="btnSortReportList" title="Сортувати матеріали за алфавітом (А–Я)" aria-label="Сортувати список за алфавітом А–Я" class="report-list-sort-button" style="flex-basis:65px;min-width:65px" >А–Я</button>
+                    </div>
                     
-                    <div id="sidebarReportListWrapper" class="accordion-wrapper pr-1 max-h-[35vh] overflow-y-auto">
-                        <div id="sidebarReportListInner" class="accordion-inner flex flex-col gap-2 pb-2">
+                    <div id="sidebarReportListWrapper" class="accordion-wrapper">
+                        <div id="sidebarReportListInner" class="accordion-inner flex flex-col gap-2 pb-2" tabindex="0" role="region" aria-label="Список матеріалів для звіту">
                         </div>
                     </div>
                 </div>
 
             </div>
         </aside>
+
+        <div id="sidebarResizeHandle" role="separator" aria-label="Змінити ширину бічної панелі" aria-orientation="vertical" tabindex="0" title="Перетягніть для зміни ширини. Подвійний клік — стандартна ширина."></div>
 
         <!-- Права панель -->
         <main class="flex-1 p-4 md:p-6 overflow-hidden relative">
@@ -330,32 +342,46 @@
                 </div>
 
                 <div id="view-calc" class="tab-pane hidden flex-1 overflow-y-auto space-y-5 pb-6">
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-5">
-                        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                            <div class="shrink-0 w-full sm:w-32 flex flex-col gap-2">
-                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Темп. (Робоча), °C</label>
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full xl:flex-1 xl:max-w-3xl">
+                            <div class="min-w-0 flex flex-col gap-2">
+                                <label class="flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 tooltip-trigger cursor-help" data-tooltip="Властивості сталі визначаються за ступінчастим консервативним підходом: обирається найближча більша дискретна температура стандарту (стовпець підсвічується в таблиці властивостей).">
+                                    <span>Темп. (Робоча), °C</span>
+                                    
+                                </label>
                                 <div class="relative">
                                     <input type="number" id="calcTemp" value="20" min="20" max="600" class="w-full bg-brand-50 dark:bg-slate-900 border border-brand-200 dark:border-slate-700 text-brand-700 dark:text-brand-400 rounded-xl focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
                                 <input type="range" id="calcTempSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
                             </div>
-                            <div class="shrink-0 w-full sm:w-32 flex flex-col gap-2">
-                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Темп. (ГВ), °C</label>
+                            <div class="min-w-0 flex flex-col gap-2">
+                                <label class="flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 tooltip-trigger cursor-help" data-tooltip="Властивості для гідравлічних випробувань беруться консервативно до найближчої більшої температури стандарту.">
+                                    <span>Темп. (ГВ), °C</span>
+                                    
+                                </label>
                                 <div class="relative">
                                     <input type="number" id="calcTempGv" value="20" min="20" max="600" class="w-full bg-indigo-50 dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-400 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 block p-3 text-center outline-none font-bold text-xl shadow-sm transition-all">
                                 </div>
                                 <input type="range" id="calcTempGvSlider" min="20" max="600" value="20" step="5" class="w-full accent-indigo-600 dark:accent-indigo-500">
                             </div>
-                            <div class="shrink-0 w-full sm:w-auto flex-1 sm:flex-none">
-                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сейсмостійкість</label>
-                                <select id="calcSeismic" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 block p-3 outline-none font-semibold text-base shadow-sm transition-all cursor-pointer">
+                            <div class="min-w-0 flex flex-col gap-2 sb-seismic-field">
+                                <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Сейсмостійкість</label>
+                                <select id="calcSeismic" class="sr-only" aria-label="Категорія сейсмостійкості">
                                     <option value="1">І категорія</option>
                                     <option value="2">ІІ категорія</option>
                                 </select>
+                                <div id="calcSeismicSegmented" class="sb-segmented-control" role="group" aria-label="Категорія сейсмостійкості">
+                                    <button type="button" class="sb-segmented-option" data-value="1" aria-pressed="true">
+                                        <span class="sb-segmented-label">І категорія</span>
+                                    </button>
+                                    <button type="button" class="sb-segmented-option" data-value="2" aria-pressed="false">
+                                        <span class="sb-segmented-label">ІІ категорія</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto xl:shrink-0">
                             <label class="flex items-center justify-between sm:justify-center cursor-pointer bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium py-3 px-4 rounded-xl transition-colors border border-slate-200 dark:border-slate-700 shadow-sm w-full sm:w-auto gap-4">
                                 <span class="text-sm shrink-0">Показати формули</span>
                                 <div class="relative inline-flex items-center">
@@ -393,7 +419,7 @@
                                     <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" id="auditStatusDesc">Розрахунок відповідає вимогам нормативності ПНАЕ G-7-002-86.</div>
                                 </div>
                             </div>
-                            <div class="hidden text-left sm:text-right text-[10px] font-bold space-y-0.5 max-w-full sm:max-w-[50%] text-slate-600 dark:text-slate-400" id="auditWarningList"></div>
+                            <div class="hidden text-left sm:text-right text-[11px] font-bold space-y-0.5 max-w-full sm:max-w-[50%] text-slate-600 dark:text-slate-400" id="auditWarningList"></div>
                         </div>
 
                         <!-- Деталі -->
@@ -579,7 +605,7 @@
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_gv"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_nue"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pnue"></td>
-                                            <td class="p-3 text-slate-400 dark:text-slate-500" id="op_R_as"></td>
+                                            <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_as"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_pz"></td>
                                             <td class="p-3 font-bold text-amber-600 dark:text-amber-400 text-base" id="op_R_mrz"></td>
                                         </tr>
@@ -596,7 +622,7 @@
                         <div class="w-2 h-6 bg-purple-500 rounded-full"></div>
                         <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Криві міцності</h3>
                     </div>
-                    <div class="relative w-full h-[400px] flex-1">
+                    <div class="relative w-full h-[400px] flex-1 min-h-[400px]">
                         <canvas id="matChart"></canvas>
                         <div id="chart-no-data" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 transition-all duration-300">
                             <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 mb-3 shadow-inner">
@@ -604,6 +630,13 @@
                             </div>
                             <h4 class="text-base font-bold text-slate-800 dark:text-slate-200">Немає числових даних для графіка</h4>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">Всі значення характеристик для цього матеріалу позначені як прочерк "—"</p>
+                        </div>
+                        <div id="chart-offline-fallback" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 transition-all duration-300">
+                            <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 mb-3 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                            </div>
+                            <h4 class="text-base font-bold text-slate-800 dark:text-slate-200">Графік недоступний в автономному режимі</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">Бібліотека Chart.js не завантажена. Основні табличні дані та розрахунки напружень працюють у повному обсязі.</p>
                         </div>
                     </div>
                     <div id="chart-warning" class="hidden mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 p-4 rounded-xl text-sm flex items-start gap-3">
@@ -780,13 +813,15 @@
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за тимчасовим опором (зазвичай 2.6 для обладнання). ПНАЕ Г-7-002-86 п.5.3.1">
                                             За тимчасовим опором (n<sub>m</sub>)
                                         </label>
-                                        <input type="number" id="calcNm" value="2.6" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcNm" value="2.6" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                     <div>
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за межею текучості (зазвичай 1.5 для обладнання). ПНАЕ Г-7-002-86 п.5.3.1">
                                             За межею текучості (n<sub>0,2</sub>)
                                         </label>
-                                        <input type="number" id="calcNt" value="1.5" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcNt" value="1.5" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                 </div>
                             </div>
@@ -799,7 +834,8 @@
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт запасу міцності за межею текучості для кріпильних деталей. ПНАЕ Г-7-002-86 п.5.4.1">
                                             За межею текучості (n<sub>0,2</sub>)
                                         </label>
-                                        <input type="number" id="calcNtBolt" value="2.0" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcNtBolt" value="2.0" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                 </div>
                             </div>
@@ -812,31 +848,38 @@
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт умов роботи конструкції. ПНАЕ Г-7-002-86 п.5.6.1">
                                             Умов межі текучості (&gamma;<sub>c</sub>)
                                         </label>
-                                        <input type="number" id="calcGc" value="1.0" step="0.1" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcGc" value="1.0" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                     <div>
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за матеріалом (залежить від типу сталі). ПНАЕ Г-7-002-86 п.5.6.1">
                                             Надійності матеріалу (&gamma;<sub>m</sub>)
                                         </label>
-                                        <input type="number" id="calcGm" value="1.05" step="0.01" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcGm" value="1.05" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                     <div>
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за призначенням для нормальних умов експлуатації. ПНАЕ Г-7-002-86 п.5.6.1">
                                             Призначення НУЕ (&gamma;<sub>n</sub>)
                                         </label>
-                                        <input type="number" id="calcGnNue" value="1.25" step="0.05" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcGnNue" value="1.25" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                     <div>
                                         <label class="flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 tooltip-trigger" data-tooltip="Коефіцієнт надійності за призначенням для особливих умов (проектний землетрус). ПНАЕ Г-7-002-86 п.5.6.1">
                                             Призначення НУЕ+ПЗ (&gamma;<sub>n</sub>)
                                         </label>
-                                        <input type="number" id="calcGnPz" value="1.05" step="0.05" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <input type="number" id="calcGnPz" value="1.05" min="0.01" step="any" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all">
+                                        <span class="coef-error text-[11px] text-rose-500 font-medium hidden mt-1 block"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex justify-end">
-                            <button type="button" id="btnApplyCoef" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95">
+                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-between gap-4">
+                            <button type="button" id="btnResetCoef" class="text-xs font-semibold text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 underline underline-offset-4 transition-colors">
+                                Скинути коефіцієнти (ПНАЕ)
+                            </button>
+                            <button type="button" id="btnApplyCoef" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-7 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95">
                                 Застосувати
                             </button>
                         </div>
@@ -924,17 +967,50 @@
                             </button>
                         </div>
                         <div class="p-5 md:px-8 md:py-6 overflow-y-auto space-y-6 flex-1 bg-white dark:bg-slate-800">
+                            <!-- Вибір сортаменту відокремлено від форми зміни параметрів КП. -->
+                            <section id="editGradePanel" class="hidden grade-editor-toolbar" aria-label="Вибір КП для редагування">
+                                <div class="grade-editor-layout">
+                                    <div class="grade-editor-selector">
+                                        <label for="editGradeSelect" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">КП / сортамент для редагування</label>
+                                        <select id="editGradeSelect" class="grade-editor-select" aria-label="Вибрати КП для редагування"></select>
+                                    </div>
+                                    <div class="grade-editor-actions">
+                                        <button type="button" id="btnAddGrade" class="grade-action grade-action-add" title="Додати іншу КП до поточної марки">
+                                            <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                                            <span>Додати КП</span>
+                                        </button>
+                                        <button type="button" id="btnDeleteGrade" class="grade-action grade-action-delete" title="Видалити тільки вибрану КП">
+                                            <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v6m4-6v6"/></svg>
+                                            <span>Видалити КП</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p id="editGradeHint" class="grade-editor-hint" aria-live="polite">Редагуються характеристики лише вибраної КП.</p>
+                            </section>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Марка сталі/сплаву *</label>
+                                    <label for="newMatName" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Марка сталі/сплаву *</label>
                                     <input type="text" id="newMatName" placeholder="Наприклад, Сталь 20" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сортамент / Опис</label>
+                                    <label for="newMatKp" id="newMatKpLabel" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Категорія міцності (КП)</label>
+                                    <input type="text" id="newMatKp" placeholder="Наприклад, 245; порожнє — без КП" class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="newMatDesc" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Сортамент / Опис виробу</label>
                                     <input type="text" id="newMatDesc" placeholder="Наприклад, Поковки..." class="w-full bg-slate-50 dark:bg-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all">
                                 </div>
                             </div>
                             
+                            <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 px-4 py-3 space-y-2">
+                                <label for="newMatBrittle" class="flex items-center gap-3 cursor-pointer text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                    <input id="newMatBrittle" type="checkbox" class="h-4 w-4 rounded border-slate-300 accent-indigo-600 shrink-0">
+                                    <span>Крихкий матеріал (зокрема чавун)</span>
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Ознака застосовується до всієї марки та всіх її КП. Для фланців: (σ)₂ при ГВ = Rᵀₘ / 1,3; при НУЕ = Rᵀₘ / 2,2. У звіті «Прокладки» рядок (σ)RV не виводиться. Інші формули не змінюються.</p>
+                                <p id="brittleAutoHint" class="hidden text-xs text-amber-700 dark:text-amber-300 leading-relaxed">Для цієї КП є Rᵀₘ, але немає Rᵀₚ₀,₂. Якщо матеріал дійсно крихкий, позначте це вручну; лише відсутність даних не визначає тип матеріалу.</p>
+                            </div>
+
                             <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
                                 <div class="table-container overflow-x-auto w-full relative">
                                     <table class="w-full text-xs text-left whitespace-nowrap border-separate border-spacing-0">
@@ -945,15 +1021,25 @@
                                     </table>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-400 font-medium">Залиште поле порожнім, якщо немає даних для певної температури.</p>
+                            <p class="text-xs text-slate-400 font-medium">Залиште поле порожнім, якщо немає даних для певної температури. Зміни зберігаються в цьому браузері. Перейменування марки стосується всіх її КП; редагування таблиці — лише вибраної КП. Для перенесення бази завантажте файл data.js. Резервна копія JSON також зберігає налаштування і списки звітів.</p>
                         </div>
-                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end gap-3 shrink-0">
-                            <button type="button" id="btnCancelAddMat" class="bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm">
-                                Скасувати
-                            </button>
-                            <button type="button" id="btnSaveAddMat" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95">
-                                Зберегти матеріал
-                            </button>
+                        <div class="p-5 md:px-8 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 mr-auto">
+                                <button type="button" id="btnDeleteMat" class="hidden text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-800 font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm text-xs sm:text-sm">
+                                    Видалити матеріал
+                                </button>
+                                <button type="button" id="btnResetMatToCore" class="hidden text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-800 font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm text-xs sm:text-sm">
+                                    Відновити початкові дані марки
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap items-center justify-end gap-3 ml-auto">
+                                <button type="button" id="btnCancelAddMat" class="bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm">
+                                    Скасувати
+                                </button>
+                                <button type="button" id="btnSaveAddMat" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95">
+                                    Зберегти матеріал
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -992,6 +1078,36 @@
         </main>
     </div>
 
-    <script src="app.js" defer></script>
+    <script src="app.js?v=20261110-tooltip-fix-1" defer></script>
+    <!-- Швидкий пошук (Ctrl + K) -->
+    <div id="quickSearchOverlay" class="sb-command-overlay" hidden>
+        <div id="quickSearchBackdrop" class="sb-command-backdrop"></div>
+        <div class="sb-command-panel" role="dialog" aria-modal="true" aria-labelledby="quickSearchTitle">
+            <div class="sb-command-head">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="quickSearchInput" type="search" autocomplete="off" placeholder="Назва матеріалу, КП або сортамент…" aria-label="Швидкий пошук" />
+                <kbd>Esc</kbd>
+            </div>
+            <div id="quickSearchTitle" class="sb-command-title">Матеріали та КП</div>
+            <div id="quickSearchResults" class="sb-command-results" role="listbox" aria-label="Результати пошуку"></div>
+            <div class="sb-command-footer"><span>↑ ↓ Переміщення</span><span>Enter Вибрати</span><span>Esc Закрити</span></div>
+        </div>
+    </div>
+    <div id="backupPreviewModal" class="sb-review-backdrop" hidden>
+        <section class="sb-review-panel" role="dialog" aria-modal="true" aria-labelledby="backupPreviewTitle">
+            <div class="sb-review-top"><h2 id="backupPreviewTitle">Попередній перегляд резервної копії</h2><button type="button" id="btnCloseBackupPreview" aria-label="Закрити">✕</button></div>
+            <div id="backupPreviewInfo" class="sb-review-info"></div>
+            <div id="backupPreviewDiff" class="sb-review-diff"></div>
+            <div class="sb-review-actions"><button type="button" id="btnCancelBackupPreview">Скасувати</button><button type="button" id="btnConfirmBackupRestore" class="sb-restore-danger">Підтвердити відновлення</button></div>
+        </section>
+    </div>
+    <div id="historyModal" class="sb-review-backdrop" hidden>
+        <section class="sb-review-panel" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+            <div class="sb-review-top"><h2 id="historyTitle">Історія змін поточного сеансу</h2><button type="button" id="btnCloseHistory" aria-label="Закрити">✕</button></div>
+            <p class="sb-history-intro">Журнал показує, що саме змінилося: назву, параметр і значення до та після. Зберігається лише протягом поточного сеансу.</p>
+            <div id="historyList" class="sb-history-list" role="log" aria-label="Історія змін"></div>
+            <div class="sb-review-actions"><button type="button" id="btnCloseHistoryBottom">Закрити</button></div>
+        </section>
+    </div>
 </body>
 </html>

@@ -68,6 +68,10 @@
             </h1>
 
             <div class="flex items-center gap-3">
+                <a href="../index.html" title="Повернутися до довідника матеріалів SuperBase" class="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    <span>До бази матеріалів</span>
+                </a>
                 <button id="themeToggle" aria-label="Перемикач теми" title="Перемикач теми" class="p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
                     <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
@@ -304,10 +308,21 @@
             }));
         }
 
+        function safeSetItem(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (e) {
+                console.error(`Storage error saving ${key}:`, e);
+                showNotification("Помилка сховища: не вдалося зберегти дані (перевищено ліміт)", true);
+                return false;
+            }
+        }
+
         function saveState(pushToHistory = true) {
             syncStateFromDOM();
-            localStorage.setItem('ansys_paths_state', JSON.stringify(state));
-            localStorage.setItem('ansys_paths_counter', pathCounter);
+            safeSetItem('ansys_paths_state', JSON.stringify(state));
+            safeSetItem('ansys_paths_counter', pathCounter);
             
             if (pushToHistory) {
                 if (historyIndex < history.length - 1) {
@@ -320,15 +335,44 @@
             updateSelectedCount();
         }
 
+        function validateRowObject(row) {
+            return Boolean(row && typeof row === 'object' && typeof row.name === 'string');
+        }
+
         function loadState(stateStr, isInit = false) {
             if (!stateStr) return false;
-            state = JSON.parse(stateStr);
+            let parsed;
+            try {
+                parsed = typeof stateStr === 'string' ? JSON.parse(stateStr) : stateStr;
+            } catch (e) {
+                console.error("Помилка парсингу стану:", e);
+                return false;
+            }
+
+            if (!Array.isArray(parsed)) return false;
+
+            const validRows = parsed.filter(validateRowObject);
+            if (validRows.length === 0 && parsed.length > 0) return false;
+
+            state = validRows.map(row => ({
+                id: row.id || generateId(),
+                name: String(row.name || ''),
+                zone: (stressData && row.zone in stressData) ? row.zone : ZONES.NONE,
+                selected: Boolean(row.selected)
+            }));
+
             renderTable();
+
             if (isInit) {
-                history = [stateStr];
+                history = [JSON.stringify(state)];
                 historyIndex = 0;
-                const savedCounter = localStorage.getItem('ansys_paths_counter');
-                if (savedCounter) pathCounter = parseInt(savedCounter, 10);
+                try {
+                    const savedCounter = localStorage.getItem('ansys_paths_counter');
+                    if (savedCounter) {
+                        const parsedCounter = parseInt(savedCounter, 10);
+                        if (!isNaN(parsedCounter)) pathCounter = parsedCounter;
+                    }
+                } catch (e) {}
             }
             return true;
         }
@@ -338,7 +382,7 @@
                 historyIndex--;
                 loadState(history[historyIndex]);
                 syncStateFromDOM();
-                localStorage.setItem('ansys_paths_state', JSON.stringify(state));
+                safeSetItem('ansys_paths_state', JSON.stringify(state));
                 showNotification("Скасовано");
             }
         }
@@ -348,7 +392,7 @@
                 historyIndex++;
                 loadState(history[historyIndex]);
                 syncStateFromDOM();
-                localStorage.setItem('ansys_paths_state', JSON.stringify(state));
+                safeSetItem('ansys_paths_state', JSON.stringify(state));
                 showNotification("Повторено");
             }
         }
@@ -542,19 +586,33 @@
                 return;
             }
 
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-                if (!isInputFocused) {
-                    e.preventDefault();
-                    const rows = tableBody.querySelectorAll('tr:not(.empty-state-row)');
-                    rows.forEach(tr => {
-                        tr.classList.add('selected-row', 'bg-indigo-50/30', 'dark:bg-indigo-950/10');
-                        const cb = tr.querySelector('.row-select');
-                        if (cb) cb.checked = true;
-                    });
-                    saveState(false);
-                    updateSelectedCount();
-                    showNotification("Виділено всі рядки");
+            if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyA' || e.key.toLowerCase() === 'a' || e.key.toLowerCase() === 'ф')) {
+                if (isInputFocused) return;
+
+                let hoveredTable = null;
+                const hoverElements = document.querySelectorAll(':hover');
+                for (let i = hoverElements.length - 1; i >= 0; i--) {
+                    if (hoverElements[i].id === 'pathTable' || hoverElements[i].closest('#pathTable')) {
+                        hoveredTable = hoverElements[i].closest('#pathTable');
+                        break;
+                    }
                 }
+                const targetTable = e.target.closest('#pathTable') || hoveredTable;
+                if (!targetTable) {
+                    // Focus/cursor outside table: allow standard browser text selection
+                    return;
+                }
+
+                e.preventDefault();
+                const rows = tableBody.querySelectorAll('tr:not(.empty-state-row)');
+                rows.forEach(tr => {
+                    tr.classList.add('selected-row', 'bg-indigo-50/30', 'dark:bg-indigo-950/10');
+                    const cb = tr.querySelector('.row-select');
+                    if (cb) cb.checked = true;
+                });
+                saveState(false);
+                updateSelectedCount();
+                showNotification("Виділено всі рядки");
                 return;
             }
 
@@ -936,12 +994,27 @@
         });
 
         // Copy Text Utilities
-        function copyTextToClipboard(text, successMsg) {
+        let isProgrammaticCopy = false;
+
+        async function copyTextToClipboard(text, successMsg) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showNotification(successMsg);
+                    return;
+                } catch (err) {
+                    console.warn("navigator.clipboard failed, using fallback:", err);
+                }
+            }
+
+            // Fallback via execCommand
+            isProgrammaticCopy = true;
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
             textArea.style.top = "0";
             textArea.style.left = "0";
+            textArea.style.opacity = "0";
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
@@ -952,12 +1025,15 @@
                 else showNotification("Помилка копіювання", true);
             } catch (err) {
                 showNotification("Не підтримується пристроєм", true);
+            } finally {
+                document.body.removeChild(textArea);
+                setTimeout(() => { isProgrammaticCopy = false; }, 50);
             }
-            document.body.removeChild(textArea);
         }
 
         document.querySelectorAll('.copy-col-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const colClass = btn.dataset.col;
                 let textToCopy = "";
 
@@ -979,6 +1055,9 @@
 
         // Copy Event Excel-style
         document.addEventListener('copy', (e) => {
+            if (isProgrammaticCopy) return;
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
             const selectedCells = Array.from(tableBody.querySelectorAll('td.col-s.cell-selected'));
             if (selectedCells.length === 0) return;
 
@@ -1085,10 +1164,27 @@
         window.onload = () => {
             initBulkDropdown();
             
-            const savedState = localStorage.getItem('ansys_paths_state');
-            if (savedState && JSON.parse(savedState).length > 0) {
-                loadState(savedState, true);
-            } else {
+            let loaded = false;
+            try {
+                const savedState = localStorage.getItem('ansys_paths_state');
+                if (savedState) {
+                    loaded = loadState(savedState, true);
+                    if (!loaded) {
+                        // Safely preserve corrupted state to backup key
+                        try {
+                            localStorage.setItem('ansys_paths_state_corrupted_backup', savedState);
+                        } catch (e) {}
+                        showNotification("Збережені дані було пошкоджено. Відновлено початкові 3 рядки (резервну копію збережено).", true);
+                    }
+                }
+            } catch (err) {
+                console.error("Помилка доступу до пам'яті браузера:", err);
+                showNotification("Помилка доступу до пам'яті браузера", true);
+            }
+
+            if (!loaded || state.length === 0) {
+                state = [];
+                pathCounter = 1;
                 document.getElementById('btnAddRow').click();
                 document.getElementById('btnAddRow').click();
                 document.getElementById('btnAddRow').click();

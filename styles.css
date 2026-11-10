@@ -1,8 +1,46 @@
-body { 
-    background-color: #f8fafc; 
+body, input, button, select, textarea { 
     transition: background-color 0.3s, color 0.3s;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
+body { background-color: #f8fafc; }
 html.dark body { background-color: #0f172a; }
+
+/* Accessible touch and focus for table action buttons */
+.focus\:opacity-100:focus {
+    opacity: 1 !important;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    th .group button,
+    th button[title*="Видалити"],
+    th button[title*="видалити"],
+    th button[title*="Видалити стовпець"] {
+        opacity: 0.9 !important;
+    }
+}
+
+/* Sidebar responsive collapse */
+#mainSidebar {
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+
+#mainSidebar.sidebar-collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-right-width: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 767px) {
+    #mainSidebar.sidebar-collapsed {
+        display: none !important;
+    }
+}
 
 ::-webkit-scrollbar { height: 8px; width: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -315,7 +353,7 @@ html.dark .formula-var:hover {
     background: #0f172a;
     color: #f1f5f9;
     font-size: 11px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-weight: normal;
     line-height: 1.4;
     border-radius: 8px;
@@ -369,4 +407,596 @@ html.dark .formula-tooltip::after {
 .accordion-inner.table-container {
     max-height: 65vh;
     overflow-y: auto;
+}
+
+
+/* --- Адаптивний список матеріалів для звіту ---
+   Текст може скорочуватися, але кнопка видалення завжди залишається справа. */
+#reportSidebarActions,
+#sidebarReportListWrapper,
+#sidebarReportListInner {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#sidebarReportListWrapper {
+    /* This element animates open/closed; scrolling belongs to its inner child. */
+    max-height: none;
+    overflow: hidden;
+}
+
+#sidebarReportListInner {
+    /* Independently scroll the report list without clipping its lower items. */
+    max-height: min(42vh, 450px);
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+    padding-right: 4px;
+}
+
+
+#sidebarReportListInner .report-list-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#sidebarReportListInner .report-list-details,
+#sidebarReportListInner .report-list-text {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#sidebarReportListInner .report-list-text > div {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sidebarReportListInner .report-list-delete {
+    display: flex;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    cursor: pointer;
+}
+
+#sidebarReportListInner .report-list-delete:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+
+/* Quick-select elements on the gasket report list. Fits in the narrow sidebar. */
+#sidebarReportListInner .report-list-item {
+    cursor: default;
+}
+#sidebarReportListInner .report-list-chips {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding-left: 36px;
+    min-width: 0;
+    margin-top: 1px;
+}
+#sidebarReportListInner .report-element-chip {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 25px;
+    padding: 3px 7px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.15;
+    white-space: nowrap;
+    background: #f8fafc;
+    color: #64748b;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color .15s, border-color .15s, color .15s;
+}
+html.dark #sidebarReportListInner .report-element-chip {
+    background: #0f172a;
+    border-color: #475569;
+    color: #94a3b8;
+}
+#sidebarReportListInner .report-element-chip.is-active,
+html.dark #sidebarReportListInner .report-element-chip.is-active {
+    background: #4f46e5;
+    border-color: #6366f1;
+    color: #fff;
+}
+#sidebarReportListInner .report-element-chip:hover:not(.is-active) {
+    background: #e0e7ff;
+    border-color: #818cf8;
+    color: #4338ca;
+}
+html.dark #sidebarReportListInner .report-element-chip:hover:not(.is-active) {
+    background: #312e81;
+    color: #e0e7ff;
+}
+#sidebarReportListInner .report-element-chip:focus-visible {
+    outline: 2px solid #818cf8;
+    outline-offset: 2px;
+}
+#sidebarReportListInner .report-list-equipped-label {
+    grid-column: 1 / -1;
+    padding-left: 44px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6366f1;
+}
+html.dark #sidebarReportListInner .report-list-equipped-label { color: #a5b4fc; }
+
+/* Повні назви КП з переносом рядків (нативний select лишається джерелом даних). */
+.kp-picker { position: relative; width: 100%; min-width: 0; }
+.kp-native-hidden { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; overflow: hidden !important; }
+.kp-picker-trigger {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; min-width: 0; min-height: 42px; padding: 10px 12px;
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+    color: #0f172a; font-size: 14px; font-weight: 500; line-height: 1.45;
+    text-align: left; cursor: pointer; transition: border-color .15s, box-shadow .15s;
+}
+.kp-picker-trigger:hover { border-color: #a5b4fc; }
+.kp-picker-trigger:focus-visible { outline: 0; border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,.13); }
+.kp-picker-trigger:disabled { opacity: .55; cursor: not-allowed; }
+.kp-picker-trigger[aria-expanded="true"] { border-color: #6366f1; }
+.kp-picker-value { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.kp-picker-chevron { flex: none; color: #94a3b8; transition: transform .15s; }
+.kp-picker-trigger[aria-expanded="true"] .kp-picker-chevron { transform: rotate(180deg); }
+html.dark .kp-picker-trigger { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+html.dark .kp-picker-trigger:hover, html.dark .kp-picker-trigger[aria-expanded="true"] { border-color: #6366f1; }
+
+.kp-picker-options {
+    position: fixed; z-index: 70; overflow-y: auto; overscroll-behavior: contain;
+    padding: 5px; border-radius: 12px; border: 1px solid #cbd5e1;
+    background: #fff; box-shadow: 0 15px 35px rgba(15,23,42,.22);
+    box-sizing: border-box;
+}
+.kp-picker-options[hidden] { display: none !important; }
+.kp-picker-option {
+    display: flex; flex-direction: column; gap: 3px; width: 100%;
+    padding: 10px 12px; border-radius: 8px; border: 1px solid transparent;
+    color: #0f172a; background: transparent; text-align: left;
+    white-space: normal; overflow-wrap: anywhere; line-height: 1.45;
+    cursor: pointer;
+}
+.kp-picker-option + .kp-picker-option { margin-top: 3px; }
+.kp-picker-option:hover, .kp-picker-option:focus-visible { background: #eef2ff; outline: none; }
+.kp-picker-option-selected { background: #eef2ff; border-color: #c7d2fe; }
+.kp-picker-option-title { display: block; font-size: 13px; font-weight: 700; color: #4338ca; }
+.kp-picker-option-description { display: block; font-size: 12px; font-weight: 500; color: #475569; }
+html.dark .kp-picker-options { background: #151e30; border-color: #475569; box-shadow: 0 16px 38px rgba(0,0,0,.45); }
+html.dark .kp-picker-option { color: #e2e8f0; }
+html.dark .kp-picker-option:hover, html.dark .kp-picker-option:focus-visible { background: #29365c; }
+html.dark .kp-picker-option-selected { background: #253159; border-color: #6366f1; }
+html.dark .kp-picker-option-title { color: #a5b4fc; }
+html.dark .kp-picker-option-description { color: #cbd5e1; }
+.copy-table-button {
+    margin-left: auto;
+    margin-right: 12px;
+    padding: 8px 12px;
+    border: 1px solid #a5b4fc;
+    border-radius: 8px;
+    color: #4338ca;
+    background: #eef2ff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.copy-table-button:hover { background: #e0e7ff; }
+.copy-table-button:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+@media (max-width: 640px) {
+    .copy-table-button { max-width: 110px; margin-left: 8px; flex-shrink: 0; }
+}
+
+
+/* Редактор матеріалу: вибір КП як компактна панель, а не світлий callout.
+   Explicit backgrounds keep contrast even if Tailwind custom palette has no brand-950. */
+.grade-editor-toolbar {
+    padding: 15px 17px 12px;
+    border: 1px solid #dbe2ef;
+    border-radius: 15px;
+    background: #f8fafc;
+}
+.grade-editor-layout {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.grade-editor-selector {
+    flex: 1 1 420px;
+    min-width: 0;
+}
+.grade-editor-select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding: 0 13px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    outline: none;
+}
+.grade-editor-select:focus-visible {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .16);
+}
+.grade-editor-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.grade-action {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    height: 44px;
+    padding: 0 13px;
+    border: 1px solid;
+    border-radius: 10px;
+    background: transparent;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+}
+.grade-action-add { color: #4f46e5; border-color: #a5b4fc; }
+.grade-action-add:hover { background-color: #e0e7ff; }
+.grade-action-delete { color: #be123c; border-color: #fda4af; }
+.grade-action-delete:hover { background-color: #ffe4e6; }
+.grade-action:focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
+.grade-action:disabled { opacity: .4; cursor: not-allowed; }
+.grade-action:disabled:hover { background: transparent; }
+.grade-editor-hint { margin-top: 9px; color: #64748b; font-size: 12px; line-height: 1.4; }
+html.dark .grade-editor-toolbar { background: #172133; border-color: #334155; }
+html.dark .grade-editor-select { background: #0f172a; border-color: #384861; color: #f1f5f9; }
+html.dark .grade-editor-select:focus-visible { border-color: #818cf8; }
+html.dark .grade-action-add { color: #a5b4fc; border-color: #5059a9; }
+html.dark .grade-action-add:hover { background: rgba(99, 102, 241, .16); }
+html.dark .grade-action-delete { color: #fda4af; border-color: #8b3650; }
+html.dark .grade-action-delete:hover { background: rgba(225, 29, 72, .13); }
+html.dark .grade-editor-hint { color: #9aaac3; }
+@media (max-width: 600px) {
+    .grade-editor-toolbar { padding: 12px; }
+    .grade-editor-selector { flex-basis: 100%; }
+    .grade-editor-actions { width: 100%; }
+    .grade-action { flex: 1; padding: 0 8px; }
+}
+
+/* Selected premium UX improvements (no theme redesign) */
+.sb-save-status{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #334155;border-radius:12px;background:rgba(100,116,139,.06);font-size:12px;line-height:1.4;color:#64748b;}
+.dark .sb-save-status{border-color:#334155;background:rgba(15,23,42,.45);color:#cbd5e1;}
+.sb-save-dot{width:9px;height:9px;border-radius:50%;background:#94a3b8;flex-shrink:0;}
+.sb-status-ok .sb-save-dot{background:#10b981}.sb-status-notice .sb-save-dot{background:#f59e0b}.sb-status-error .sb-save-dot{background:#f43f5e}
+.sb-save-title{font-weight:700;font-size:12px}.sb-save-info{font-size:11px;opacity:.82}
+.sb-command-overlay[hidden]{display:none!important}.sb-command-overlay{position:fixed;inset:0;z-index:110;display:flex;align-items:flex-start;justify-content:center;padding:12vh 16px 20px}
+.sb-command-backdrop{position:absolute;inset:0;background:rgba(2,6,23,.68);backdrop-filter:blur(6px)}
+.sb-command-panel{position:relative;display:flex;flex-direction:column;width:min(680px,100%);max-height:min(74vh,640px);background:#fff;color:#1e293b;border:1px solid #cbd5e1;border-radius:18px;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.28)}
+.dark .sb-command-panel{background:#192438;color:#f1f5f9;border-color:#334155}
+.sb-command-head{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #e2e8f0;color:#64748b}
+.dark .sb-command-head{border-color:#334155;color:#94a3b8}
+.sb-command-head input{flex:1;min-width:0;outline:none;border:0!important;background:transparent!important;color:inherit;font:500 16px Inter,system-ui,sans-serif}
+.sb-command-head input::placeholder{color:#94a3b8}.sb-command-head kbd{border:1px solid #cbd5e1;border-radius:6px;font-size:11px;padding:3px 5px}.dark .sb-command-head kbd{border-color:#475569}
+.sb-command-title{padding:12px 18px 5px;text-transform:uppercase;font-size:11px;letter-spacing:.07em;font-weight:700;color:#64748b}
+.dark .sb-command-title{color:#94a3b8}.sb-command-results{overflow-y:auto;min-height:80px;padding:8px;overscroll-behavior:contain}
+.sb-command-result{display:flex;flex-direction:column;align-items:flex-start;gap:4px;border-radius:10px;padding:11px 13px;width:100%;text-align:left;border:1px solid transparent;background:transparent;color:inherit;cursor:pointer}
+.sb-command-result strong{font-size:14px}.sb-command-result span{font-size:12px;opacity:.72;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-command-result.is-active,.sb-command-result:hover{background:#eef2ff;border-color:#c7d2fe}.dark .sb-command-result.is-active,.dark .sb-command-result:hover{background:rgba(99,102,241,.15);border-color:#4f46e5}
+.sb-command-empty{padding:22px;text-align:center;color:#94a3b8;font-size:13px}.sb-command-footer{display:flex;gap:18px;padding:11px 18px;border-top:1px solid #e2e8f0;font-size:11px;color:#64748b}.dark .sb-command-footer{border-color:#334155;color:#94a3b8}
+/* Slightly larger small secondary text, but formulas and numeric tables retain density. */
+#recentMaterialsWrapper label{font-size:11px}
+@media(prefers-reduced-motion:reduce){.sb-command-panel,.sb-command-overlay{transition:none!important}}
+
+/* Report list: explicit alphabetization + manual drag ordering */
+#btnSortReportList.report-list-sort-button {
+    flex: 0 0 49px;
+    min-width: 49px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #c7d2fe;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: background-color .18s, border-color .18s;
+}
+#btnSortReportList:hover { background: #e0e7ff; border-color: #818cf8; }
+#btnSortReportList:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+html.dark #btnSortReportList { background: #283353; border-color: #475b99; color: #c7d2fe; }
+html.dark #btnSortReportList:hover { background: #343f76; }
+#sidebarReportListInner .report-list-item[draggable="true"] { cursor: grab; }
+#sidebarReportListInner .report-list-item[draggable="true"]:active { cursor: grabbing; }
+#sidebarReportListInner .report-list-item[draggable="true"] button { cursor: pointer; }
+
+/* SuperBase — інтегровані покращення 2026-11-05 */
+:root { --sb-sidebar-width: 340px; }
+@media (min-width: 768px) {
+  #mainSidebar:not(.sidebar-collapsed) {
+    width: var(--sb-sidebar-width) !important;
+    min-width: var(--sb-sidebar-width) !important;
+    max-width: var(--sb-sidebar-width) !important;
+  }
+  header > div:first-child { width: var(--sb-sidebar-width) !important; min-width: var(--sb-sidebar-width) !important; }
+}
+#sidebarResizeHandle { display:none; }
+@media (min-width:768px) {
+  #sidebarResizeHandle {
+    display:block; flex:0 0 6px; width:6px; position:relative; z-index:25;
+    cursor: col-resize; background: transparent; margin-left:-3px; margin-right:-3px;
+  }
+  #sidebarResizeHandle:hover, #sidebarResizeHandle:focus-visible { background:rgba(99,102,241,.65); outline:none; }
+  #sidebarResizeHandle:after { content:''; position:absolute; left:-6px; right:-6px; top:0; bottom:0; }
+  html.sb-resizing, html.sb-resizing * { cursor: col-resize !important; user-select:none !important; }
+  html.sb-resizing #mainSidebar { transition:none !important; }
+}
+/* Фіксація перших двох логічних колонок: працює і з rowspan. */
+#view-table .sticky-col-header, #view-report .sticky-col-header { left:auto; }
+#view-table table .sb-frozen-first,
+#view-report table .sb-frozen-first {
+    position:sticky !important; left:0 !important; z-index:13;
+    background-color: #fff; box-shadow:inset -1px 0 rgba(148,163,184,.25);
+}
+#view-table table .sb-frozen-second,
+#view-report table .sb-frozen-second {
+    position:sticky !important; left:var(--sb-frozen-first-width, 240px) !important; z-index:12;
+    background-color:#fff; box-shadow:inset -1px 0 rgba(148,163,184,.25);
+}
+html.dark #view-table table .sb-frozen-first, html.dark #view-report table .sb-frozen-first,
+html.dark #view-table table .sb-frozen-second, html.dark #view-report table .sb-frozen-second {
+    background-color:#1e293b; box-shadow:inset -1px 0 rgba(148,163,184,.2);
+}
+#view-table thead .sb-frozen-first, #view-report thead .sb-frozen-first { z-index:35 !important; background-color:#f8fafc !important; }
+#view-table thead .sb-frozen-second, #view-report thead .sb-frozen-second { z-index:34 !important; background-color:#f8fafc !important; }
+html.dark #view-table thead .sb-frozen-first, html.dark #view-report thead .sb-frozen-first,
+html.dark #view-table thead .sb-frozen-second, html.dark #view-report thead .sb-frozen-second { background-color:#0f172a !important; }
+/* Окремо оформлюємо клітинку, що одночасно належить активній температурі й виділена. */
+#view-table td.active-temp-col.cell-selected,
+#view-table td.cell-selected.active-temp-col {
+    background-color:#c7d2fe !important;
+    color:#312e81 !important;
+    box-shadow:inset 0 0 0 2px #4f46e5, 0 0 0 1px #818cf8 !important;
+    position:relative; z-index:15;
+}
+html.dark #view-table td.active-temp-col.cell-selected {
+    background-color:#43387b !important;
+    color:#fff !important;
+    box-shadow:inset 0 0 0 2px #a5b4fc, 0 0 0 1px #818cf8 !important;
+}
+#view-table td.active-temp-col.cell-copied { background-color:#10b981 !important; color:white !important; }
+/* Історія змін у верхній панелі */
+.sb-history-toolbar { display:flex; gap:3px; margin-left:auto; align-items:center; }
+.sb-history-toolbar button { border:1px solid rgba(148,163,184,.3); border-radius:9px; color:#475569; padding:5px 9px; font-size:13px; font-weight:650; background:rgba(248,250,252,.72); white-space:nowrap; }
+html.dark .sb-history-toolbar button { background:#1e293b; color:#cbd5e1; border-color:#334155; }
+.sb-history-toolbar button:hover:not(:disabled) { border-color:#6366f1; color:#6366f1; }
+.sb-history-toolbar button:disabled { opacity:.32; cursor:not-allowed; }
+@media(max-width:1240px) { .sb-history-label { display:none; } }
+.sb-sync-details { display:block; width:100%; text-align:center; padding:6px 10px; color:#4f46e5; font-size:12px; font-weight:650; border:1px dashed rgba(99,102,241,.4); border-radius:9px; background:rgba(99,102,241,.05); }
+html.dark .sb-sync-details { color:#a5b4fc; }
+.sb-review-backdrop { position:fixed; inset:0; z-index:120; display:flex; justify-content:center; align-items:center; padding:16px; background:rgba(2,6,23,.73); backdrop-filter:blur(5px); }
+.sb-review-backdrop[hidden] { display:none !important; }
+.sb-review-panel { width:min(680px,96vw); max-height:min(80vh,750px); display:flex; flex-direction:column; background:#fff; color:#1e293b; border-radius:16px; box-shadow:0 28px 90px rgba(0,0,0,.3); padding:18px; gap:14px; border:1px solid #cbd5e1; }
+html.dark .sb-review-panel { background:#1e293b; color:#f1f5f9; border-color:#475569; }
+.sb-review-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.sb-review-top h2 { font-size:17px; font-weight:750; }
+.sb-review-top button { padding:6px 10px; border-radius:8px; background:rgba(148,163,184,.16); }
+.sb-review-info { font-size:13px; line-height:1.55; white-space:pre-wrap; color:#64748b; }
+html.dark .sb-review-info { color:#cbd5e1; }
+.sb-review-diff { overflow:auto; min-height:120px; white-space:pre-wrap; overflow-wrap:anywhere; font-family:inherit; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; font-size:12px; line-height:1.6; }
+html.dark .sb-review-diff { background:#0f172a; border-color:#475569; }
+.sb-review-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; }
+.sb-review-actions button { border-radius:10px; padding:9px 14px; border:1px solid #94a3b8; font-size:13px; font-weight:650; }
+.sb-review-actions .sb-restore-danger { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+.sb-review-actions .sb-restore-danger[hidden] { display:none; }
+
+@media (min-width:768px) { #mainSidebar.sidebar-collapsed + #sidebarResizeHandle { display:none; } }
+
+/* Пошук: помітна кнопка для існуючої панелі Ctrl+K */
+.sb-open-quick-search { position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2;
+    padding:4px 5px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#64748b;
+    font:600 11px/1.4 Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap; }
+.sb-open-quick-search:hover,.sb-open-quick-search:focus-visible { border-color:#818cf8;color:#4338ca;background:#eef2ff;outline:2px solid #818cf8;outline-offset:1px; }
+html.dark .sb-open-quick-search {background:#1e293b;color:#cbd5e1;border-color:#475569}
+html.dark .sb-open-quick-search:hover { background:#312e81;color:#eef2ff; }
+.sb-open-quick-search kbd {font:inherit;pointer-events:none}
+
+/* У звіті обладнання користувач може переставляти стовпці вручну. */
+.sb-equip-column-order-controls{display:flex;gap:5px;justify-content:center;margin-top:5px}
+.sb-equip-column-order-controls button{border:1px solid #cbd5e1;border-radius:5px;padding:0 8px;
+    line-height:19px;font-size:13px;color:#475569;background:rgba(255,255,255,.5);cursor:pointer}
+.sb-equip-column-order-controls button:hover:not(:disabled),.sb-equip-column-order-controls button:focus-visible{color:#4338ca;border-color:#818cf8;background:#eef2ff}
+.sb-equip-column-order-controls button:disabled{opacity:.25;cursor:not-allowed}
+html.dark .sb-equip-column-order-controls button{color:#cbd5e1;border-color:#475569;background:rgba(15,23,42,.5)}
+html.dark .sb-equip-column-order-controls button:hover:not(:disabled){background:#312e81;color:#fff}
+.sb-brittle-notice {display:block;margin-top:7px;font-size:10px;line-height:1.35;
+    color:#b45309;font-weight:600;white-space:normal;}
+html.dark .sb-brittle-notice{color:#fbbf24}
+
+/* Достатньо місця для видимої кнопки в полі пошуку (незалежно від Tailwind) */
+#searchInput {padding-right:78px !important;}
+
+/* Деталізований журнал змін SuperBase */
+#historyModal .sb-review-panel { width:min(820px, 96vw); }
+.sb-history-intro { font-size:13px; color:#64748b; line-height:1.55; }
+html.dark .sb-history-intro { color:#cbd5e1; }
+.sb-history-list { background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; border-radius:12px; min-height:110px; padding:12px; max-height:55vh; overflow-y:auto; display:flex; flex-direction:column; gap:9px; }
+html.dark .sb-history-list { background:#0f172a; color:#f1f5f9; border-color:#475569; }
+.sb-history-count { color:#64748b; font-size:12px; padding:0 3px 4px; }
+html.dark .sb-history-count { color:#94a3b8; }
+.sb-history-entry { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:11px 12px; overflow-wrap:anywhere; }
+html.dark .sb-history-entry { background:#1e293b; border-color:#334155; }
+.sb-history-entry-head { display:flex; align-items:baseline; gap:10px; line-height:1.5; }
+.sb-history-time { flex:none; color:#64748b; font-size:12px; font-variant-numeric:tabular-nums; }
+html.dark .sb-history-time { color:#94a3b8; }
+.sb-history-summary { font-size:13px; font-weight:650; }
+.sb-history-details { margin-top:6px; padding-left:2px; font-size:12px; }
+.sb-history-details summary { color:#4f46e5; cursor:pointer; font-weight:550; }
+html.dark .sb-history-details summary { color:#a5b4fc; }
+.sb-history-details ul { list-style:disc; margin:7px 0 0 17px; padding:0; line-height:1.65; }
+.sb-history-details li { padding:2px 0; }
+.sb-history-empty { text-align:center; color:#64748b; padding:20px; font-size:13px; }
+@media (max-width:640px) { .sb-history-entry-head { flex-direction:column; gap:1px; } }
+
+
+/* Tooltips rendered in document.body: never clipped by scroll containers */
+.sb-tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-left: 3px;
+    padding: 2px;
+    color: #818cf8;
+    background: transparent;
+    border: 0;
+    border-radius: 5px;
+    cursor: help;
+    vertical-align: middle;
+}
+.sb-tooltip-icon:hover,
+.sb-tooltip-icon:focus-visible {
+    color: #a5b4fc;
+    outline: 2px solid rgba(129, 140, 248, .55);
+    outline-offset: 2px;
+}
+.sb-tooltip-popup {
+    position: fixed;
+    z-index: 99999;
+    width: max-content;
+    max-width: min(270px, calc(100vw - 24px));
+    padding: 9px 12px;
+    border: 1px solid rgba(148, 163, 184, .25);
+    border-radius: 9px;
+    background: #0f172a;
+    color: #f8fafc;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+    font: 400 12px/1.5 'Inter', system-ui, sans-serif;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: normal;
+    overflow-wrap: break-word;
+    pointer-events: none;
+}
+
+
+/* --- Compact seismic category switch --- */
+.sb-seismic-field { container-type: inline-size; }
+
+.sb-segmented-control {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+    gap: 4px;
+    padding: 5px;
+    border: 1px solid #cbd5e1;
+    border-radius: 13px;
+    background: #f1f5f9;
+}
+
+html.dark .sb-segmented-control {
+    border-color: #334155;
+    background: #0f172a;
+}
+
+.sb-segmented-option {
+    appearance: none;
+    box-sizing: border-box;
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 6px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #475569;
+    cursor: pointer;
+    font: 600 13px/1.25 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+    box-shadow: none;
+    transition: color 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+html.dark .sb-segmented-option { color: #94a3b8; }
+.sb-segmented-option:not(.is-active):hover {
+    background: rgba(148, 163, 184, .14);
+    color: #334155;
+}
+html.dark .sb-segmented-option:not(.is-active):hover {
+    background: rgba(148, 163, 184, .12);
+    color: #e2e8f0;
+}
+
+.sb-segmented-option.is-active {
+    color: #3730a3;
+    background: #fff;
+    border-color: #dbe3f1;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, .1);
+}
+
+html.dark .sb-segmented-option.is-active {
+    color: #e0e7ff;
+    background: #283657;
+    border-color: #465781;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .22);
+}
+
+.sb-segmented-option:focus-visible {
+    outline: 2px solid #818cf8;
+    outline-offset: 2px;
+}
+
+.sb-segmented-label {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+/* Respond to field width, not viewport width. */
+@container (max-width: 219px) {
+    .sb-segmented-control { grid-template-columns: 1fr; }
 }
